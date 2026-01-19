@@ -8,4 +8,7 @@ export default defineConfig({
     exclude: ['lucide-react'],
     include: ['@stripe/react-stripe-js', '@stripe/stripe-js'],
   },
+  resolve: {
+    dedupe: ['react', 'react-dom'],
+  },
 });
