@@ -163,6 +163,10 @@ export function BookingPage() {
 
       const monthError = validateRequired(formData.month, 'Mois');
       if (monthError) newErrors.month = monthError;
+
+      if (destinationError || tourTypeError || monthError) {
+        newErrors.selectedTours = 'Veuillez sélectionner au moins un tour';
+      }
     } else {
       // Si des tours sont déjà sélectionnés, c'est OK
       if (!formData.destination && !formData.tourType && !formData.month) {
@@ -402,6 +406,18 @@ export function BookingPage() {
       <section className="py-20 bg-[#0a0e27]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <form onSubmit={handleSubmit} className="bg-gray-900 rounded-xl border border-gray-800 p-8">
+            {Object.keys(errors).length > 0 && (
+              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+                <p className="text-sm font-semibold text-red-400 mb-2">
+                  Veuillez corriger les erreurs suivantes :
+                </p>
+                <ul className="text-sm text-red-300 list-disc list-inside space-y-1">
+                  {Object.entries(errors).map(([field, message]) => (
+                    <li key={field}>{message}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <div className="mb-10">
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
                 <Users className="w-6 h-6 mr-2 text-pink-500" />
@@ -849,20 +865,34 @@ export function BookingPage() {
                       key={index}
                       className="flex items-center space-x-4 mb-4 p-4 bg-[#0a0e27] border border-gray-800 rounded-lg"
                     >
-                      <input
-                        type="text"
-                        placeholder="Nom du participant"
-                        value={participant.name}
-                        onChange={(e) => updateParticipant(index, 'name', e.target.value)}
-                        className="flex-1 px-4 py-2 bg-gray-900 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-pink-500"
-                      />
-                      <input
-                        type="tel"
-                        placeholder="Téléphone"
-                        value={participant.phone}
-                        onChange={(e) => updateParticipant(index, 'phone', e.target.value)}
-                        className="flex-1 px-4 py-2 bg-gray-900 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-pink-500"
-                      />
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      placeholder="Nom du participant"
+                      value={participant.name}
+                      onChange={(e) => updateParticipant(index, 'name', e.target.value)}
+                      className="w-full px-4 py-2 bg-gray-900 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-pink-500"
+                    />
+                    {errors[`participant_${index}_name`] && (
+                      <p className="mt-1 text-xs text-red-400">
+                        {errors[`participant_${index}_name`]}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      type="tel"
+                      placeholder="Téléphone"
+                      value={participant.phone}
+                      onChange={(e) => updateParticipant(index, 'phone', e.target.value)}
+                      className="w-full px-4 py-2 bg-gray-900 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-pink-500"
+                    />
+                    {errors[`participant_${index}_phone`] && (
+                      <p className="mt-1 text-xs text-red-400">
+                        {errors[`participant_${index}_phone`]}
+                      </p>
+                    )}
+                  </div>
                       <button
                         type="button"
                         onClick={() => removeParticipant(index)}
