@@ -34,6 +34,14 @@ VITE_STRIPE_PUBLISHABLE_KEY=pk_test_votre_cle_ici
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_51AbCdEfGhIjKlMnOpQrStUvWxYz1234567890
 ```
 
+### 3.b. Configurer la clé secrète (Netlify)
+
+Ajoutez cette variable **dans Netlify** (Settings → Environment variables) :
+
+```env
+STRIPE_SECRET_KEY=sk_test_votre_cle_ici
+```
+
 ### 4. Redémarrer le Serveur
 
 Après avoir ajouté la clé, redémarrez le serveur :
@@ -76,6 +84,30 @@ Voir toutes les cartes de test : [https://stripe.com/docs/testing](https://strip
 4. **Utilisateur entre ses informations de carte**
 5. **Stripe traite le paiement**
 6. **Réservation sauvegardée dans Supabase avec confirmation de paiement**
+
+## 🔔 Webhook Stripe (recommandé)
+
+Pour mettre à jour automatiquement le statut de paiement dans Supabase :
+
+1. Créez un webhook dans Stripe vers :
+```
+https://<votre-site-netlify>/.netlify/functions/stripe-webhook
+```
+2. Événements à écouter :
+   - `payment_intent.succeeded`
+   - `payment_intent.payment_failed`
+3. Ajoutez la variable dans Netlify :
+```env
+STRIPE_WEBHOOK_SECRET=whsec_votre_secret_ici
+```
+
+### Supabase Service Role (pour le webhook)
+
+Ajoutez aussi :
+```env
+SUPABASE_URL=https://niwftjjdxrevahfpfvgd.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=votre_service_role_key
+```
 
 ## ⚠️ Important - Mode Production
 

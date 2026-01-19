@@ -48,6 +48,7 @@ export function BookingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [bookingData, setBookingData] = useState<BookingInsert | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   const destinations = [
     { value: 'turkey', label: 'Turquie', months: ['Février', 'Avril', 'Août', 'Novembre'] },
@@ -255,16 +256,49 @@ export function BookingPage() {
 
     setBookingData(booking);
 
-    // Si Stripe est configuré et qu'il y a un montant à payer, sauvegarder d'abord puis afficher le formulaire de paiement
+    // Si Stripe est configuré et qu'il y a un montant à payer, créer un PaymentIntent côté serveur
     if (isStripeConfigured && totalAmount > 0) {
       try {
-        // Sauvegarder la réservation avec le statut "pending" avant le paiement
         setIsSubmitting(true);
-        await createBooking(booking);
-        setIsSubmitting(false);
-        
-        // Afficher le formulaire de paiement
+        const response = await fetch('/.netlify/functions/create-payment-intent', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            amount: formatAmountForStripe(totalAmount * 0.7),
+            currency: 'usd',
+            metadata: {
+              email: booking.email,
+              destination: booking.destination,
+              tour_type: booking.tour_type,
+            },
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Erreur lors de la création du paiement');
+        }
+
+        const data = await response.json();
+        if (!data?.clientSecret || !data?.paymentIntentId) {
+          throw new Error('Client secret manquant pour le paiement');
+        }
+
+        await createBooking({
+          ...booking,
+          payment_intent_id: data.paymentIntentId,
+          payment_status: 'pending',
+        });
+
+        setBookingData({
+          ...booking,
+          payment_intent_id: data.paymentIntentId,
+          payment_status: 'pending',
+        });
+        setClientSecret(data.clientSecret);
         setShowPayment(true);
+        setIsSubmitting(false);
         // Scroll to payment form
         setTimeout(() => {
           const paymentElement = document.getElementById('payment-section');
@@ -272,8 +306,9 @@ export function BookingPage() {
         }, 100);
       } catch (error: any) {
         console.error('Booking save error:', error);
+        setClientSecret(null);
         setIsSubmitting(false);
-        const errorMessage = error?.message || 'Erreur lors de la sauvegarde de la réservation';
+        const errorMessage = error?.message || 'Erreur lors de la création du paiement';
         showNotification('error', errorMessage);
       }
     } else {
@@ -282,16 +317,22 @@ export function BookingPage() {
     }
   };
 
-  const saveBooking = async (booking: BookingInsert) => {
+  const saveBooking = async (booking: BookingInsert, paymentIntentId?: string) => {
     setIsSubmitting(true);
 
     try {
-      // Save to Supabase
-      await createBooking(booking);
+      const bookingWithPayment: BookingInsert = {
+        ...booking,
+        payment_intent_id: paymentIntentId,
+        payment_status: paymentIntentId ? 'succeeded' : booking.payment_status,
+      };
+      await createBooking(bookingWithPayment);
 
       showNotification(
         'success',
-        'Réservation soumise avec succès! Nous vous contacterons sous peu.',
+        paymentIntentId
+          ? 'Réservation et paiement confirmés avec succès! Vous recevrez un email de confirmation.'
+          : 'Réservation soumise avec succès! Nous vous contacterons sous peu.',
         7000
       );
 
@@ -319,6 +360,7 @@ export function BookingPage() {
       setErrors({});
       setShowPayment(false);
       setBookingData(null);
+      setClientSecret(null);
     } catch (error: any) {
       console.error('Booking error:', error);
       const errorMessage = error?.message || 'Une erreur est survenue. Veuillez réessayer.';
@@ -338,50 +380,46 @@ export function BookingPage() {
   };
 
   const handlePaymentSuccess = async (paymentIntentId: string) => {
-    if (bookingData) {
-      // La réservation a déjà été sauvegardée avec le statut "pending"
-      // En production, vous devriez mettre à jour la réservation avec paymentIntentId et payment_status: 'succeeded'
-      // Pour l'instant, on affiche le message de succès
-      setIsSubmitting(true);
-      try {
-        console.log('Payment successful, PaymentIntent ID:', paymentIntentId);
-        
-        showNotification(
-          'success',
-          'Réservation et paiement confirmés avec succès! Vous recevrez un email de confirmation.',
-          7000
-        );
-        
-        // Reset form
-        setFormData({
-          companyName: '',
-          position: '',
-          email: '',
-          phone: '',
-          country: '',
-          destination: '',
-          tourType: '',
-          selectedTours: [],
-          month: '',
-          numParticipants: 1,
-          isGroup: false,
-          participationReason: 'networking',
-          passportNumber: '',
-          passportExpiry: '',
-          travelType: 'business',
-          wantsExtension: false,
-          extensionDays: 0,
-        });
-        setParticipants([]);
-        setErrors({});
-        setShowPayment(false);
-        setBookingData(null);
-      } catch (error: any) {
-        console.error('Payment success error:', error);
-        showNotification('error', 'Erreur lors de la confirmation du paiement');
-      } finally {
-        setIsSubmitting(false);
-      }
+    if (!bookingData) {
+      return;
+    }
+
+    try {
+      console.log('Payment successful, PaymentIntent ID:', paymentIntentId);
+      showNotification(
+        'success',
+        'Réservation et paiement confirmés avec succès! Vous recevrez un email de confirmation.',
+        7000
+      );
+
+      // Reset form
+      setFormData({
+        companyName: '',
+        position: '',
+        email: '',
+        phone: '',
+        country: '',
+        destination: '',
+        tourType: '',
+        selectedTours: [],
+        month: '',
+        numParticipants: 1,
+        isGroup: false,
+        participationReason: 'networking',
+        passportNumber: '',
+        passportExpiry: '',
+        travelType: 'business',
+        wantsExtension: false,
+        extensionDays: 0,
+      });
+      setParticipants([]);
+      setErrors({});
+      setShowPayment(false);
+      setBookingData(null);
+      setClientSecret(null);
+    } catch (error: any) {
+      console.error('Payment success error:', error);
+      showNotification('error', 'Erreur lors de la confirmation du paiement');
     }
   };
 
@@ -987,32 +1025,36 @@ export function BookingPage() {
                 </div>
               </div>
 
-              <Elements
-                stripe={getStripe()}
-                options={{
-                  mode: 'payment',
-                  amount: formatAmountForStripe(calculateTotal() * 0.7), // 70% pour confirmer la réservation
-                  currency: 'usd',
-                  appearance: {
-                    theme: 'night',
-                    variables: {
-                      colorPrimary: '#ec4899',
-                      colorBackground: '#111827',
-                      colorText: '#ffffff',
-                      colorDanger: '#ef4444',
-                      fontFamily: 'system-ui, sans-serif',
-                      spacingUnit: '4px',
-                      borderRadius: '8px',
+              {clientSecret ? (
+                <Elements
+                  stripe={getStripe()}
+                  options={{
+                    clientSecret,
+                    appearance: {
+                      theme: 'night',
+                      variables: {
+                        colorPrimary: '#ec4899',
+                        colorBackground: '#111827',
+                        colorText: '#ffffff',
+                        colorDanger: '#ef4444',
+                        fontFamily: 'system-ui, sans-serif',
+                        spacingUnit: '4px',
+                        borderRadius: '8px',
+                      },
                     },
-                  },
-                }}
-              >
-                <PaymentForm
-                  amount={calculateTotal() * 0.7}
-                  onSuccess={handlePaymentSuccess}
-                  onError={handlePaymentError}
-                />
-              </Elements>
+                  }}
+                >
+                  <PaymentForm
+                    amount={calculateTotal() * 0.7}
+                    onSuccess={handlePaymentSuccess}
+                    onError={handlePaymentError}
+                  />
+                </Elements>
+              ) : (
+                <div className="p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-yellow-400 text-sm">
+                  Initialisation du paiement en cours...
+                </div>
+              )}
             </div>
           )}
 
