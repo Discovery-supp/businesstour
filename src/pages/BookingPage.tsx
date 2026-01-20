@@ -162,6 +162,16 @@ export function BookingPage() {
     return total;
   };
 
+  // Calculer le montant à payer maintenant (70%)
+  const calculateAmountToPay = () => {
+    return calculateTotal() * 0.7;
+  };
+
+  // Calculer le reste à payer (30%)
+  const calculateRemainingAmount = () => {
+    return calculateTotal() * 0.3;
+  };
+
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -256,10 +266,48 @@ export function BookingPage() {
       return;
     }
     
-    // Utiliser le premier tour sélectionné ou le tour en cours
-    const primaryTour = formData.selectedTours.length > 0 
-      ? formData.selectedTours[0] 
-      : { destination: formData.destination, tourType: formData.tourType, month: formData.month };
+    // Construire la liste complète des tours (sélectionnés + en cours si pas encore ajouté)
+    const allTours: Array<{ destination: string; tourType: string; month: string }> = [...formData.selectedTours];
+    
+    // Si un tour est en cours de sélection mais pas encore ajouté, l'ajouter
+    if (formData.destination && formData.tourType && formData.month) {
+      const isAlreadyAdded = formData.selectedTours.some(
+        t => t.destination === formData.destination && 
+             t.tourType === formData.tourType && 
+             t.month === formData.month
+      );
+      if (!isAlreadyAdded) {
+        allTours.push({
+          destination: formData.destination,
+          tourType: formData.tourType,
+          month: formData.month,
+        });
+      }
+    }
+    
+    // Calculer les détails de chaque tour avec prix, montant payé (70%) et reste (30%)
+    const toursDetails = allTours.map(tour => {
+      const tourType = tourTypes.find(t => t.value === tour.tourType);
+      const price = tourType ? (tourType.prices[tour.destination as keyof typeof tourType.prices] || 0) * formData.numParticipants : 0;
+      const amountPaid = price * 0.7; // 70% payé maintenant
+      const remainingAmount = price * 0.3; // 30% restant
+      
+      return {
+        destination: tour.destination,
+        tour_type: tour.tourType,
+        month: tour.month,
+        price,
+        amount_paid: amountPaid,
+        remaining_amount: remainingAmount,
+      };
+    });
+    
+    const isMultiTour = allTours.length > 1;
+    const totalPaid = toursDetails.reduce((sum, tour) => sum + tour.amount_paid, 0);
+    const totalRemaining = toursDetails.reduce((sum, tour) => sum + tour.remaining_amount, 0);
+    
+    // Utiliser le premier tour comme tour principal (pour compatibilité)
+    const primaryTour = allTours[0];
     
     const booking: BookingInsert = {
       company_name: formData.companyName,
@@ -279,6 +327,11 @@ export function BookingPage() {
       total_amount: totalAmount,
       participants: formData.isGroup && participants.length > 0 ? participants : undefined,
       payment_status: 'pending',
+      // Nouveaux champs pour multi-tours
+      is_multi_tour: isMultiTour,
+      tours: toursDetails,
+      amount_paid: totalPaid,
+      remaining_amount: totalRemaining,
     };
 
     setBookingData(booking);
@@ -302,7 +355,9 @@ export function BookingPage() {
         const functionsUrl = `${functionsBase}/.netlify/functions/create-payment-intent`;
         
         console.log('Creating payment intent at:', functionsUrl);
-        console.log('Amount to pay (70%):', totalAmount * 0.7);
+        console.log('Amount to pay (70%):', totalPaid);
+        console.log('Tours details:', toursDetails);
+        console.log('Is multi-tour:', isMultiTour);
         
         const response = await fetch(functionsUrl, {
           method: 'POST',
@@ -310,12 +365,14 @@ export function BookingPage() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            amount: formatAmountForStripe(totalAmount * 0.7),
+            amount: formatAmountForStripe(totalPaid),
             currency: 'usd',
             metadata: {
               email: booking.email,
               destination: booking.destination,
               tour_type: booking.tour_type,
+              is_multi_tour: isMultiTour.toString(),
+              num_tours: allTours.length.toString(),
             },
           }),
         });
@@ -1008,10 +1065,13 @@ export function BookingPage() {
               <div className="mb-8 p-6 bg-gradient-to-r from-pink-500/10 to-purple-600/10 rounded-lg border border-pink-500/30">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-1">Total Estimé</h3>
+                    <h3 className="text-lg font-semibold text-white mb-1">
+                      {formData.selectedTours.length > 0 || (formData.destination && formData.tourType && formData.month)
+                        ? (formData.selectedTours.length > 0 ? `${formData.selectedTours.length + (formData.destination && formData.tourType && formData.month ? 1 : 0)} Tour(s)` : 'Total Estimé')
+                        : 'Total Estimé'}
+                    </h3>
                     <p className="text-sm text-gray-400">
-                      {formData.numParticipants} participant(s) × $
-                      {calculateTotal() / formData.numParticipants}
+                      {formData.numParticipants} participant(s)
                     </p>
                   </div>
                   <div className="text-right">
@@ -1020,6 +1080,55 @@ export function BookingPage() {
                     </div>
                   </div>
                 </div>
+                
+                {/* Détails des tours si multi-tours */}
+                {(formData.selectedTours.length > 0 || (formData.destination && formData.tourType && formData.month)) && (
+                  <div className="mb-4 pt-4 border-t border-pink-500/20">
+                    <h4 className="text-sm font-semibold text-white mb-2">Détails des tours :</h4>
+                    <div className="space-y-2">
+                      {formData.selectedTours.map((tour, index) => {
+                        const tourType = tourTypes.find(t => t.value === tour.tourType);
+                        const price = tourType ? (tourType.prices[tour.destination as keyof typeof tourType.prices] || 0) * formData.numParticipants : 0;
+                        const dest = destinations.find(d => d.value === tour.destination);
+                        return (
+                          <div key={index} className="text-xs text-gray-300 bg-[#0a0e27] p-2 rounded">
+                            <div className="flex justify-between">
+                              <span>{dest?.label} - {tourType?.label} ({tour.month})</span>
+                              <span className="font-semibold">${price.toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between mt-1 text-gray-400">
+                              <span>Payé (70%): ${(price * 0.7).toLocaleString()}</span>
+                              <span>Reste (30%): ${(price * 0.3).toLocaleString()}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                      {formData.destination && formData.tourType && formData.month && 
+                       !formData.selectedTours.some(t => t.destination === formData.destination && t.tourType === formData.tourType && t.month === formData.month) && (
+                        <div className="text-xs text-gray-300 bg-[#0a0e27] p-2 rounded">
+                          {(() => {
+                            const tourType = tourTypes.find(t => t.value === formData.tourType);
+                            const price = tourType ? (tourType.prices[formData.destination as keyof typeof tourType.prices] || 0) * formData.numParticipants : 0;
+                            const dest = destinations.find(d => d.value === formData.destination);
+                            return (
+                              <>
+                                <div className="flex justify-between">
+                                  <span>{dest?.label} - {tourType?.label} ({formData.month})</span>
+                                  <span className="font-semibold">${price.toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between mt-1 text-gray-400">
+                                  <span>Payé (70%): ${(price * 0.7).toLocaleString()}</span>
+                                  <span>Reste (30%): ${(price * 0.3).toLocaleString()}</span>
+                                </div>
+                              </>
+                            );
+                          })()}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
                 <div className="pt-4 border-t border-pink-500/20">
                   <div className="flex items-start space-x-2">
                     <div className="text-yellow-400 text-lg">💰</div>
@@ -1028,10 +1137,10 @@ export function BookingPage() {
                         Paiement de 70% requis pour confirmer votre réservation
                       </p>
                       <p className="text-xs text-gray-400">
-                        Montant à payer maintenant : <span className="font-semibold text-white">${(calculateTotal() * 0.7).toLocaleString()}</span>
+                        Montant à payer maintenant (70%) : <span className="font-semibold text-white">${calculateAmountToPay().toLocaleString()}</span>
                       </p>
                       <p className="text-xs text-gray-400 mt-1">
-                        Solde restant (30%) : <span className="font-semibold text-white">${(calculateTotal() * 0.3).toLocaleString()}</span> - à payer avant le départ
+                        Solde restant (30%) : <span className="font-semibold text-white">${calculateRemainingAmount().toLocaleString()}</span> - à payer avant le départ
                       </p>
                     </div>
                   </div>
@@ -1104,11 +1213,11 @@ export function BookingPage() {
                     },
                   }}
                 >
-                  <PaymentForm
-                    amount={calculateTotal() * 0.7}
-                    onSuccess={handlePaymentSuccess}
-                    onError={handlePaymentError}
-                  />
+                <PaymentForm
+                  amount={calculateAmountToPay()}
+                  onSuccess={handlePaymentSuccess}
+                  onError={handlePaymentError}
+                />
                 </Elements>
               ) : (
                 <div className="p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-yellow-400 text-sm">

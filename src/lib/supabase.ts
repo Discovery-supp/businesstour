@@ -14,15 +14,24 @@ if (!isSupabaseConfigured) {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Database types
+export interface TourDetail {
+  destination: string;
+  tour_type: string;
+  month: string;
+  price: number;
+  amount_paid: number; // 70% payé
+  remaining_amount: number; // 30% restant
+}
+
 export interface BookingInsert {
   company_name: string;
   position: string;
   email: string;
   phone: string;
   country: string;
-  destination: string;
-  tour_type: string;
-  month: string;
+  destination: string; // Tour principal (pour compatibilité)
+  tour_type: string; // Tour principal (pour compatibilité)
+  month: string; // Tour principal (pour compatibilité)
   num_participants: number;
   is_group: boolean;
   participation_reason: string;
@@ -33,6 +42,11 @@ export interface BookingInsert {
   participants?: Array<{ name: string; phone: string }>;
   payment_intent_id?: string;
   payment_status?: 'pending' | 'succeeded' | 'failed' | 'canceled';
+  // Nouveaux champs pour multi-tours
+  is_multi_tour?: boolean;
+  tours?: TourDetail[]; // Détails de tous les tours
+  amount_paid?: number; // Montant total payé (70%)
+  remaining_amount?: number; // Montant total restant (30%)
 }
 
 export interface ContactInsert {
