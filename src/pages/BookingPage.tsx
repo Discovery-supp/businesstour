@@ -260,8 +260,16 @@ export function BookingPage() {
     if (isStripeConfigured && totalAmount > 0) {
       try {
         setIsSubmitting(true);
+        
+        // Déterminer l'URL de base pour les fonctions Netlify
+        // En local avec netlify dev: http://localhost:8888
+        // En production: URL relative (vide = même origine)
         const functionsBase = import.meta.env.VITE_FUNCTIONS_BASE || '';
-        const response = await fetch(`${functionsBase}/.netlify/functions/create-payment-intent`, {
+        const functionsUrl = `${functionsBase}/.netlify/functions/create-payment-intent`;
+        
+        console.log('Creating payment intent at:', functionsUrl);
+        
+        const response = await fetch(functionsUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -278,11 +286,14 @@ export function BookingPage() {
         });
 
         if (!response.ok) {
-          throw new Error('Erreur lors de la création du paiement');
+          const errorText = await response.text();
+          console.error('Payment intent error:', errorText);
+          throw new Error(`Erreur lors de la création du paiement: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
         if (!data?.clientSecret || !data?.paymentIntentId) {
+          console.error('Invalid payment intent response:', data);
           throw new Error('Client secret manquant pour le paiement');
         }
 
@@ -311,6 +322,9 @@ export function BookingPage() {
         setIsSubmitting(false);
         const errorMessage = error?.message || 'Erreur lors de la création du paiement';
         showNotification('error', errorMessage);
+        // Fallback: sauvegarder sans paiement si la fonction échoue
+        console.warn('Falling back to save booking without payment');
+        await saveBooking(booking);
       }
     } else {
       // Si Stripe n'est pas configuré ou montant = 0, sauvegarder directement

@@ -8,9 +8,11 @@ interface AdminPageProps {
   onNavigate?: (page: string) => void;
 }
 
+type BookingRow = Booking & { tour?: Tour; payment_status?: string };
+
 export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
   const { user, isAdmin, loading: authLoading, signOut } = useAuth();
-  const [bookings, setBookings] = useState<(Booking & { tour?: Tour })[]>([]);
+  const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
 
@@ -74,13 +76,16 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
 
   const filteredBookings = filter === 'all'
     ? bookings
-    : bookings.filter(b => b.status === filter);
+    : filter === 'in_progress'
+      ? bookings.filter((booking) => booking.status === 'pending' || booking.payment_status === 'pending')
+      : bookings.filter((booking) => booking.status === filter);
 
   const stats = {
     total: bookings.length,
     pending: bookings.filter(b => b.status === 'pending').length,
     confirmed: bookings.filter(b => b.status === 'confirmed').length,
     completed: bookings.filter(b => b.status === 'completed').length,
+    inProgress: bookings.filter(b => b.status === 'pending' || b.payment_status === 'pending').length,
   };
 
   const getStatusBadge = (status: string) => {
@@ -142,7 +147,7 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
@@ -163,6 +168,18 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
               </div>
               <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
                 <Clock className="w-6 h-6 text-yellow-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">En cours</p>
+                <p className="text-3xl font-bold text-orange-600">{stats.inProgress}</p>
+              </div>
+              <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                <Clock className="w-6 h-6 text-orange-600" />
               </div>
             </div>
           </div>
@@ -210,6 +227,14 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                 }`}
               >
                 En attente ({stats.pending})
+              </button>
+              <button
+                onClick={() => setFilter('in_progress')}
+                className={`px-4 py-2 rounded-lg font-medium transition ${
+                  filter === 'in_progress' ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                En cours ({stats.inProgress})
               </button>
               <button
                 onClick={() => setFilter('confirmed')}
