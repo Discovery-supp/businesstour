@@ -118,7 +118,18 @@ export function BookingPage() {
         const tourType = tourTypes.find((t) => t.value === tour.tourType);
         if (tourType) {
           const price = tourType.prices[tour.destination as keyof typeof tourType.prices] || 0;
-          total += price * formData.numParticipants;
+          const tourTotal = price * formData.numParticipants;
+          total += tourTotal;
+          console.log('Tour calculation:', {
+            tourType: tour.tourType,
+            destination: tour.destination,
+            price,
+            numParticipants: formData.numParticipants,
+            tourTotal,
+            runningTotal: total,
+          });
+        } else {
+          console.warn('Tour type not found:', tour.tourType);
         }
       });
     } else {
@@ -128,10 +139,26 @@ export function BookingPage() {
         if (tourType) {
           const price = tourType.prices[formData.destination as keyof typeof tourType.prices] || 0;
           total = price * formData.numParticipants;
+          console.log('Single tour calculation:', {
+            tourType: formData.tourType,
+            destination: formData.destination,
+            price,
+            numParticipants: formData.numParticipants,
+            total,
+          });
+        } else {
+          console.warn('Tour type not found:', formData.tourType);
         }
+      } else {
+        console.log('No tour selected:', {
+          destination: formData.destination,
+          tourType: formData.tourType,
+          selectedTours: formData.selectedTours.length,
+        });
       }
     }
     
+    console.log('Final total:', total);
     return total;
   };
 
