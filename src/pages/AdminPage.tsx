@@ -8,7 +8,21 @@ interface AdminPageProps {
   onNavigate?: (page: string) => void;
 }
 
-type BookingRow = Booking & { tour?: Tour; payment_status?: string };
+type BookingRow = Booking & { 
+  tour?: Tour; 
+  payment_status?: string;
+  is_multi_tour?: boolean;
+  tours?: Array<{
+    destination: string;
+    tour_type: string;
+    month: string;
+    price: number;
+    amount_paid: number;
+    remaining_amount: number;
+  }>;
+  amount_paid?: number;
+  remaining_amount?: number;
+};
 
 export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
   const { user, isAdmin, loading: authLoading, signOut } = useAuth();
@@ -260,10 +274,11 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Client</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Tour</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Tour(s)</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Date</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Participants</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Prix</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Prix Total</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Payé / Reste</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
                 </tr>
@@ -289,23 +304,62 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm font-medium text-gray-900">
-                        {booking.tour?.title || 'N/A'}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        {booking.is_multi_tour && booking.tours ? (
+                          <>
+                            <span className="text-xs text-blue-600 font-semibold">Multi-tours ({booking.tours.length})</span>
+                            {booking.tours.map((tour, idx) => (
+                              <div key={idx} className="text-xs text-gray-600">
+                                {tour.destination} - {tour.tour_type} ({tour.month})
+                              </div>
+                            ))}
+                          </>
+                        ) : (
+                          <span className="text-sm font-medium text-gray-900">
+                            {booking.tour?.title || booking.destination || 'N/A'}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm text-gray-900">{booking.selected_date}</span>
+                      <span className="text-sm text-gray-900">{booking.selected_date || booking.month || 'N/A'}</span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1">
                         <Users className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-900">{booking.num_participants}</span>
+                        <span className="text-sm text-gray-900">{booking.num_participants || booking.numParticipants || 'N/A'}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1">
                         <DollarSign className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm font-semibold text-gray-900">{booking.total_price}€</span>
+                        <span className="text-sm font-semibold text-gray-900">
+                          ${(booking.total_amount || booking.totalAmount || 0).toLocaleString()}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col gap-1">
+                        <div className="text-xs text-green-600 font-semibold">
+                          Payé: ${(booking.amount_paid || 0).toLocaleString()}
+                        </div>
+                        <div className="text-xs text-orange-600 font-semibold">
+                          Reste: ${(booking.remaining_amount || 0).toLocaleString()}
+                        </div>
+                        {booking.is_multi_tour && booking.tours && (
+                          <details className="mt-1">
+                            <summary className="text-xs text-gray-500 cursor-pointer">Détails par tour</summary>
+                            <div className="mt-1 space-y-1">
+                              {booking.tours.map((tour, idx) => (
+                                <div key={idx} className="text-xs text-gray-600 pl-2 border-l-2 border-gray-300">
+                                  <div>{tour.destination} - {tour.tour_type}</div>
+                                  <div className="text-green-600">Payé: ${tour.amount_paid.toLocaleString()}</div>
+                                  <div className="text-orange-600">Reste: ${tour.remaining_amount.toLocaleString()}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </details>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4">
