@@ -260,7 +260,8 @@ export function BookingPage() {
     if (isStripeConfigured && totalAmount > 0) {
       try {
         setIsSubmitting(true);
-        const response = await fetch('/.netlify/functions/create-payment-intent', {
+        const functionsBase = import.meta.env.VITE_FUNCTIONS_BASE || '';
+        const response = await fetch(`${functionsBase}/.netlify/functions/create-payment-intent`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
