@@ -256,6 +256,13 @@ export function BookingPage() {
 
     setBookingData(booking);
 
+    // Debug: vérifier la configuration
+    console.log('Payment check:', {
+      isStripeConfigured,
+      totalAmount,
+      stripeKey: import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ? 'Present' : 'Missing',
+    });
+
     // Si Stripe est configuré et qu'il y a un montant à payer, créer un PaymentIntent côté serveur
     if (isStripeConfigured && totalAmount > 0) {
       try {
@@ -268,6 +275,7 @@ export function BookingPage() {
         const functionsUrl = `${functionsBase}/.netlify/functions/create-payment-intent`;
         
         console.log('Creating payment intent at:', functionsUrl);
+        console.log('Amount to pay (70%):', totalAmount * 0.7);
         
         const response = await fetch(functionsUrl, {
           method: 'POST',
@@ -285,13 +293,17 @@ export function BookingPage() {
           }),
         });
 
+        console.log('Payment intent response status:', response.status);
+
         if (!response.ok) {
           const errorText = await response.text();
           console.error('Payment intent error:', errorText);
-          throw new Error(`Erreur lors de la création du paiement: ${response.status} ${response.statusText}`);
+          throw new Error(`Erreur lors de la création du paiement: ${response.status} ${response.statusText}. Vérifiez les logs Netlify.`);
         }
 
         const data = await response.json();
+        console.log('Payment intent data:', { hasClientSecret: !!data?.clientSecret, hasPaymentIntentId: !!data?.paymentIntentId });
+        
         if (!data?.clientSecret || !data?.paymentIntentId) {
           console.error('Invalid payment intent response:', data);
           throw new Error('Client secret manquant pour le paiement');
@@ -317,17 +329,23 @@ export function BookingPage() {
           paymentElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 100);
       } catch (error: any) {
-        console.error('Booking save error:', error);
+        console.error('Payment setup error:', error);
         setClientSecret(null);
         setIsSubmitting(false);
         const errorMessage = error?.message || 'Erreur lors de la création du paiement';
-        showNotification('error', errorMessage);
-        // Fallback: sauvegarder sans paiement si la fonction échoue
-        console.warn('Falling back to save booking without payment');
-        await saveBooking(booking);
+        
+        // Ne pas faire de fallback silencieux - demander à l'utilisateur
+        showNotification('error', `${errorMessage}. La réservation n'a pas été créée. Veuillez réessayer.`);
+        return; // Ne pas sauvegarder si le paiement échoue
       }
     } else {
       // Si Stripe n'est pas configuré ou montant = 0, sauvegarder directement
+      if (!isStripeConfigured) {
+        console.warn('Stripe not configured - saving booking without payment');
+      }
+      if (totalAmount === 0) {
+        console.warn('Total amount is 0 - saving booking without payment');
+      }
       await saveBooking(booking);
     }
   };
