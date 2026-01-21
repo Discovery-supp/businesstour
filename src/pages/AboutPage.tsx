@@ -8,11 +8,22 @@ export function AboutPage() {
     <div className="pt-16 bg-[#0a0e27]">
       <section className="bg-gradient-to-br from-[#0a0e27] via-gray-900 to-[#0a0e27] text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('about.title')}</h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-pink-500 to-purple-600 mb-6"></div>
-          <p className="text-xl text-gray-300 max-w-3xl">
-            Nous sommes une équipe d'entrepreneurs passionnés qui croit fermement que l'échange d'expertises, de biens, de technologies et une collaboration pragmatique constituent le levier le plus puissant pour transformer des idées audacieuses en entreprises prospères. Depuis 2023, nous adoptons une démarche d'innovation ouverte et de développement collaboratif, en consolidant un réseau de partenaires et d'experts sur les marchés internationaux et en accompagnant les entrepreneurs dans la concrétisation et l'épanouissement de leurs projets. Nous faisons du voyage d'affaires un vecteur d'impact positif collectif.
-          </p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('about.title')}</h1>
+              <div className="w-24 h-1 bg-gradient-to-r from-pink-500 to-purple-600 mb-6"></div>
+              <p className="text-xl text-gray-300 max-w-3xl">
+                Nous sommes une équipe d'entrepreneurs passionnés qui croit fermement que l'échange d'expertises, de biens, de technologies et une collaboration pragmatique constituent le levier le plus puissant pour transformer des idées audacieuses en entreprises prospères. Depuis 2023, nous adoptons une démarche d'innovation ouverte et de développement collaboratif, en consolidant un réseau de partenaires et d'experts sur les marchés internationaux et en accompagnant les entrepreneurs dans la concrétisation et l'épanouissement de leurs projets. Nous faisons du voyage d'affaires un vecteur d'impact positif collectif.
+              </p>
+            </div>
+            <div className="relative">
+              <img
+                src="/images/about-image.jpg"
+                alt="Business Tours Team"
+                className="rounded-xl border border-gray-800 shadow-2xl w-full h-auto object-cover"
+              />
+            </div>
+          </div>
         </div>
       </section>
 
