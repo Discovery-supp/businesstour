@@ -26,7 +26,7 @@ const salons: Salon[] = [
     date: 'Mars 2026',
     description: 'Le plus grand salon industriel de la région, réunissant des milliers d\'entreprises et d\'investisseurs.',
     descriptionEn: 'The largest industrial fair in the region, bringing together thousands of companies and investors.',
-    image: 'salon-1.jpg',
+    image: 'https://images.unsplash.com/photo-1587825143138-066a8b3c937b?w=800&h=600&fit=crop',
     category: 'salon',
     participants: 50000,
     website: 'https://example.com',
@@ -40,7 +40,7 @@ const salons: Salon[] = [
     date: 'Avril 2026',
     description: 'Plateforme majeure pour le commerce international et les opportunités d\'affaires B2B.',
     descriptionEn: 'Major platform for international trade and B2B business opportunities.',
-    image: 'salon-2.jpg',
+    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop',
     category: 'foire',
     participants: 75000,
     website: 'https://example.com',
@@ -54,7 +54,7 @@ const salons: Salon[] = [
     date: 'Juin 2026',
     description: 'Découvrez les dernières innovations technologiques et rencontrez les leaders de l\'industrie.',
     descriptionEn: 'Discover the latest technological innovations and meet industry leaders.',
-    image: 'salon-3.jpg',
+    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=600&fit=crop',
     category: 'salon',
     participants: 100000,
     website: 'https://example.com',
@@ -68,7 +68,7 @@ const salons: Salon[] = [
     date: 'Octobre 2026',
     description: 'Événement phare pour les entreprises africaines et internationales.',
     descriptionEn: 'Flagship event for African and international businesses.',
-    image: 'salon-4.jpg',
+    image: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&h=600&fit=crop',
     category: 'foire',
     participants: 30000,
     website: 'https://example.com',
@@ -82,7 +82,7 @@ const salons: Salon[] = [
     date: 'Novembre 2026',
     description: 'Rencontrez les experts de l\'énergie renouvelable et des technologies vertes.',
     descriptionEn: 'Meet renewable energy and green technology experts.',
-    image: 'salon-5.jpg',
+    image: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&h=600&fit=crop',
     category: 'salon',
     participants: 40000,
     website: 'https://example.com',
@@ -96,7 +96,7 @@ const salons: Salon[] = [
     date: 'Décembre 2026',
     description: 'Le rendez-vous incontournable pour l\'industrie agroalimentaire mondiale.',
     descriptionEn: 'The must-attend event for the global food and agriculture industry.',
-    image: 'salon-6.jpg',
+    image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&h=600&fit=crop',
     category: 'foire',
     participants: 60000,
     website: 'https://example.com',
@@ -136,9 +136,10 @@ export function SalonsPage() {
                 {/* Image */}
                 <div className="relative h-48 bg-gradient-to-br from-pink-500/20 to-purple-600/20 overflow-hidden">
                   <img
-                    src={`/salons/${salon.image}`}
+                    src={salon.image.startsWith('http') ? salon.image : `/salons/${salon.image}`}
                     alt={isFrench ? salon.name : salon.nameEn}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                    loading="lazy"
                     onError={(e) => {
                       // Fallback si l'image ne charge pas - affiche un placeholder avec gradient
                       const target = e.target as HTMLImageElement;
@@ -156,6 +157,8 @@ export function SalonsPage() {
                       }
                     }}
                   />
+                  {/* Overlay gradient pour meilleure lisibilité du badge */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                   <div className="absolute top-4 right-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                       salon.category === 'salon'
