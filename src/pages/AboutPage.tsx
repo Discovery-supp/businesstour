@@ -11,7 +11,7 @@ export function AboutPage() {
           <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('about.title')}</h1>
           <div className="w-24 h-1 bg-gradient-to-r from-pink-500 to-purple-600 mb-6"></div>
           <p className="text-xl text-gray-300 max-w-3xl">
-            Nous sommes une équipe d'entrepreneurs passionnés qui croit fermement que l'échange d'expertises, de biens, de technologies et une collaboration pragmatique constituent le levier le plus puissant pour transformer des idées audacieuses en entreprises prospères.
+            Nous sommes une équipe d'entrepreneurs passionnés qui croit fermement que l'échange d'expertises, de biens, de technologies et une collaboration pragmatique constituent le levier le plus puissant pour transformer des idées audacieuses en entreprises prospères. Depuis 2023, nous adoptons une démarche d'innovation ouverte et de développement collaboratif, en consolidant un réseau de partenaires et d'experts sur les marchés internationaux et en accompagnant les entrepreneurs dans la concrétisation et l'épanouissement de leurs projets. Nous faisons du voyage d'affaires un vecteur d'impact positif collectif.
           </p>
         </div>
       </section>
