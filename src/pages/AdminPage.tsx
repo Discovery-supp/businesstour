@@ -369,8 +369,10 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                   const hasTours = booking.is_multi_tour && booking.tours && booking.tours.length > 0;
 
                   // Calcul du prix total
+                  // Pour multi-tours : le prix dans tours[] est déjà multiplié par participants lors de la création
+                  // Donc on additionne simplement les prix sans re-multiplier
                   const baseTotal = hasTours
-                    ? booking.tours!.reduce((sum, tour) => sum + (tour.price || 0), 0) * participants
+                    ? booking.tours!.reduce((sum, tour) => sum + (tour.price || 0), 0)
                     : (booking.total_amount as number | undefined) ??
                       ((booking as any).totalAmount as number | undefined) ??
                       0;
