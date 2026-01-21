@@ -2,7 +2,10 @@
 const https = require('https');
 const http = require('http');
 
-const email = 'scongodiscovery18@gmail.com';
+// Resend en mode test ne permet d'envoyer qu'à l'email du compte
+// Change cette adresse pour tester avec ton email Resend
+const email = 'trickson.mabengi@gmail.com'; // Email du compte Resend
+// Pour envoyer à scongodiscovery18@gmail.com, il faut vérifier un domaine dans Resend
 const functionsUrl = 'http://localhost:8888/.netlify/functions/test-email';
 
 console.log('🚀 Test d\'envoi d\'email à:', email);

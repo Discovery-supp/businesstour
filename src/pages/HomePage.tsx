@@ -178,16 +178,24 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="py-20 bg-gray-900 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-pink-500 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600 rounded-full blur-3xl"></div>
+      <section className="py-20 relative overflow-hidden min-h-[500px] flex items-center">
+        {/* Image de fond */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: 'url(/images/conference-background.jpg)',
+          }}
+        >
+          {/* Overlay sombre pour améliorer la lisibilité du texte */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/70"></div>
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+        
+        {/* Contenu */}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10 w-full">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 drop-shadow-lg">
             Prêt à Transformer Votre Vision en Réalité?
           </h2>
-          <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-200 mb-8 max-w-3xl mx-auto drop-shadow-md">
             Rejoignez des centaines d'entrepreneurs qui ont accéléré leur croissance grâce à nos business tours.
           </p>
           <button
