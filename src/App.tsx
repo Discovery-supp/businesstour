@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { LanguageProvider } from './context/LanguageContext';
 import { NotificationProvider, useNotification } from './context/NotificationContext';
+import { AuthProvider } from './context/AuthContext';
 import { NotificationContainer } from './components/Notification';
 import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
@@ -13,6 +14,7 @@ import { TestimonialsPage } from './pages/TestimonialsPage';
 import { BlogPage } from './pages/BlogPage';
 import { ContactPage } from './pages/ContactPage';
 import { SalonsPage } from './pages/SalonsPage';
+import AdminPage from './pages/AdminPage';
 
 // Component to handle scroll to top on route change
 function ScrollToTop() {
@@ -43,6 +45,7 @@ function AppContent() {
             <Route path="/testimonials" element={<TestimonialsPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/admin" element={<AdminPage />} />
           </Routes>
         </main>
         <Footer />
@@ -59,7 +62,9 @@ function App() {
   return (
     <LanguageProvider>
       <NotificationProvider>
-        <AppContent />
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
       </NotificationProvider>
     </LanguageProvider>
   );
