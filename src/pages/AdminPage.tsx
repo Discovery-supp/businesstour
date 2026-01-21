@@ -368,19 +368,32 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
 
                   const hasTours = booking.is_multi_tour && booking.tours && booking.tours.length > 0;
 
+                  // Calcul du prix total
                   const baseTotal = hasTours
                     ? booking.tours!.reduce((sum, tour) => sum + (tour.price || 0), 0) * participants
                     : (booking.total_amount as number | undefined) ??
                       ((booking as any).totalAmount as number | undefined) ??
                       0;
 
+                  // Calcul du montant total payé
                   const totalPaid = hasTours
                     ? booking.tours!.reduce((sum, tour) => sum + (tour.amount_paid || 0), 0)
                     : booking.amount_paid ?? 0;
 
-                  let totalRemaining =
-                    booking.remaining_amount ??
-                    Math.max(baseTotal - totalPaid, 0);
+                  // Calcul du montant restant
+                  // Pour multi-tours : somme des remaining_amount de chaque tour
+                  // Pour tour unique : remaining_amount de la réservation ou calcul
+                  let totalRemaining: number;
+                  if (hasTours) {
+                    // Pour multi-tours, on somme les restes de chaque tour
+                    totalRemaining = booking.tours!.reduce((sum, tour) => {
+                      const tourRemaining = tour.remaining_amount ?? 0;
+                      return sum + tourRemaining;
+                    }, 0);
+                  } else {
+                    // Pour tour unique, on utilise remaining_amount ou on calcule
+                    totalRemaining = booking.remaining_amount ?? Math.max(baseTotal - totalPaid, 0);
+                  }
 
                   const paymentStatus = booking.payment_status;
                   let displayStatus: 'pending' | 'confirmed' | 'completed' | 'cancelled' = 'pending';
