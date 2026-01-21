@@ -17,6 +17,7 @@ export function Navigation() {
     { path: '/testimonials', label: t('nav.testimonials') },
     { path: '/blog', label: t('nav.blog') },
     { path: '/contact', label: t('nav.contact') },
+    { path: '/admin', label: t('nav.admin') },
   ];
 
   const isActive = (path: string) => {

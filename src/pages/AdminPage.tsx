@@ -25,26 +25,20 @@ type BookingRow = Booking & {
 };
 
 export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
-  const { user, isAdmin, loading: authLoading, signOut } = useAuth();
+  const { user, isAdmin, loading: authLoading, signOut, signIn } = useAuth();
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
-
-  useEffect(() => {
-    if (!authLoading && !user) {
-      if (onNavigate) {
-        onNavigate('login');
-      }
-    } else if (!authLoading && user && !isAdmin) {
-      if (onNavigate) {
-        onNavigate('home');
-      }
-    }
-  }, [user, isAdmin, authLoading, onNavigate]);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
     if (isAdmin) {
       fetchBookings();
+    } else {
+      setLoading(false);
     }
   }, [isAdmin]);
 
@@ -83,9 +77,18 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
 
   const handleSignOut = async () => {
     await signOut();
-    if (onNavigate) {
-      onNavigate('home');
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError(null);
+    setLoginLoading(true);
+    const { error } = await signIn(loginEmail, loginPassword);
+    if (error) {
+      console.error('Admin login error:', error);
+      setLoginError('Identifiants invalides ou accès non autorisé.');
     }
+    setLoginLoading(false);
   };
 
   const filteredBookings = filter === 'all'
@@ -125,12 +128,81 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
     );
   };
 
-  if (authLoading || loading) {
+  if (authLoading || (loading && isAdmin)) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Non connecté : formulaire de connexion admin
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Espace Administrateur</h1>
+          <p className="text-sm text-gray-600 mb-6">
+            Connectez-vous avec vos identifiants administrateur pour consulter les réservations et les paiements.
+          </p>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                required
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+              <input
+                type="password"
+                required
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            {loginError && (
+              <p className="text-sm text-red-600">{loginError}</p>
+            )}
+            <button
+              type="submit"
+              disabled={loginLoading}
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition disabled:opacity-60"
+            >
+              {loginLoading ? 'Connexion...' : 'Se connecter'}
+            </button>
+          </form>
+          <p className="mt-4 text-xs text-gray-500">
+            L'accès est réservé aux administrateurs. Les rôles sont gérés dans la table <code>user_roles</code> de Supabase.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Connecté mais pas admin
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-white rounded-xl shadow-lg border border-gray-200 p-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Accès refusé</h1>
+          <p className="text-sm text-gray-600 mb-6">
+            Votre compte n'a pas les droits administrateur pour accéder à ce tableau de bord.
+          </p>
+          <button
+            onClick={handleSignOut}
+            className="px-6 py-2 bg-gray-800 hover:bg-gray-900 text-white rounded-lg font-semibold transition"
+          >
+            Se déconnecter
+          </button>
         </div>
       </div>
     );
