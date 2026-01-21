@@ -81,9 +81,49 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
 
   const updateBookingStatus = async (bookingId: string, newStatus: string) => {
     try {
+      // Trouver la réservation actuelle pour calculer les montants
+      const currentBooking = bookings.find(b => b.id === bookingId);
+      if (!currentBooking) {
+        alert('Réservation introuvable');
+        return;
+      }
+
+      const hasTours = currentBooking.is_multi_tour && currentBooking.tours && currentBooking.tours.length > 0;
+      
+      // Calcul du prix total
+      const baseTotal = hasTours
+        ? currentBooking.tours!.reduce((sum, tour) => sum + (tour.price || 0), 0)
+        : (currentBooking.total_amount as number | undefined) ?? 0;
+
+      // Préparer les données de mise à jour
+      let updateData: any = {
+        updated_at: new Date().toISOString(),
+      };
+
+      // Si le statut est "completed", enregistrer "clos" dans la base et finaliser les paiements
+      if (newStatus === 'completed') {
+        updateData.status = 'clos';
+        updateData.remaining_amount = 0;
+        updateData.amount_paid = baseTotal;
+        updateData.payment_status = 'succeeded';
+
+        // Pour les multi-tours, mettre à jour chaque tour
+        if (hasTours && currentBooking.tours) {
+          const updatedTours = currentBooking.tours.map(tour => ({
+            ...tour,
+            amount_paid: tour.price || 0,
+            remaining_amount: 0,
+          }));
+          updateData.tours = updatedTours;
+        }
+      } else {
+        // Pour les autres statuts, mettre à jour seulement le statut
+        updateData.status = newStatus;
+      }
+
       const { error } = await supabase
         .from('bookings')
-        .update({ status: newStatus, updated_at: new Date().toISOString() })
+        .update(updateData)
         .eq('id', bookingId);
 
       if (error) {
@@ -96,7 +136,20 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
       setBookings(prevBookings => 
         prevBookings.map(booking => 
           booking.id === bookingId 
-            ? { ...booking, status: newStatus as any }
+            ? { 
+                ...booking, 
+                status: newStatus === 'completed' ? 'clos' : newStatus as any,
+                remaining_amount: newStatus === 'completed' ? 0 : booking.remaining_amount,
+                amount_paid: newStatus === 'completed' ? baseTotal : booking.amount_paid,
+                payment_status: newStatus === 'completed' ? 'succeeded' : booking.payment_status,
+                tours: newStatus === 'completed' && hasTours && booking.tours
+                  ? booking.tours.map(tour => ({
+                      ...tour,
+                      amount_paid: tour.price || 0,
+                      remaining_amount: 0,
+                    }))
+                  : booking.tours,
+              }
             : booking
         )
       );
@@ -147,7 +200,9 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
     ? bookings
     : filter === 'in_progress'
       ? bookings.filter((booking) => booking.status === 'pending' || booking.payment_status === 'pending')
-      : bookings.filter((booking) => booking.status === filter);
+      : filter === 'completed'
+        ? bookings.filter((booking) => booking.status === 'completed' || booking.status === 'clos')
+        : bookings.filter((booking) => booking.status === filter);
 
   const stats = {
     total: bookings.length,
@@ -159,7 +214,7 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
       (b) => b.status === 'confirmed'
     ).length,
     completed: bookings.filter(
-      (b) => b.status === 'completed'
+      (b) => b.status === 'completed' || b.status === 'clos'
     ).length,
     inProgress: bookings.filter(
       (b) => b.status === 'pending' || b.payment_status === 'pending'
@@ -478,9 +533,14 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                   
                   // Vérifier d'abord le statut manuel (status)
                   const bookingStatus = booking.status as string | undefined;
-                  if (bookingStatus && ['pending', 'confirmed', 'completed', 'cancelled'].includes(bookingStatus)) {
+                  if (bookingStatus && ['pending', 'confirmed', 'completed', 'cancelled', 'clos'].includes(bookingStatus)) {
                     // Le statut manuel a la priorité
-                    displayStatus = bookingStatus as 'pending' | 'confirmed' | 'completed' | 'cancelled';
+                    // "clos" est affiché comme "completed" dans l'interface
+                    if (bookingStatus === 'clos') {
+                      displayStatus = 'completed';
+                    } else {
+                      displayStatus = bookingStatus as 'pending' | 'confirmed' | 'completed' | 'cancelled';
+                    }
                   } else {
                     // Fallback sur payment_status si status n'est pas défini
                     const paymentStatus = booking.payment_status;
