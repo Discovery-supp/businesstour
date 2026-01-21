@@ -351,7 +351,7 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
             }`}
           >
-            Contacts ({contacts.length})
+            Partenaires ({contacts.length})
           </button>
         </div>
 
@@ -608,9 +608,9 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
         {activeTab === 'contacts' && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Messages de contact</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Partenaires</h2>
               <p className="text-sm text-gray-600 mt-1">
-                Liste des personnes qui ont rempli le formulaire de contact.
+                Liste des partenaires ou prospects qui ont rempli le formulaire.
               </p>
             </div>
             <div className="overflow-x-auto">
