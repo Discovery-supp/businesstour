@@ -461,7 +461,31 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1">
                         <Users className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-900">{booking.num_participants || booking.numParticipants || 'N/A'}</span>
+                        <span className="text-sm text-gray-900">{participants}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col gap-1">
+                        {hasTours ? (
+                          <>
+                            <span className="text-xs text-gray-500">Par tour:</span>
+                            {booking.tours!.map((tour, idx) => {
+                              const pricePerPerson = participants > 0 ? (tour.price || 0) / participants : 0;
+                              return (
+                                <div key={idx} className="text-xs text-gray-600">
+                                  {tour.destination}: ${pricePerPerson.toLocaleString()}
+                                </div>
+                              );
+                            })}
+                            <span className="text-xs font-semibold text-gray-900 mt-1">
+                              Total: ${(participants > 0 ? baseTotal / participants : 0).toLocaleString()}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-sm font-semibold text-gray-900">
+                            ${(participants > 0 ? baseTotal / participants : 0).toLocaleString()}
+                          </span>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4">
