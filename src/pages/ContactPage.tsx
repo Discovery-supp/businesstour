@@ -12,6 +12,8 @@ export function ContactPage() {
     email: '',
     phone: '',
     subject: '',
+    partnershipObject: '',
+    businessSector: '',
     message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,6 +28,8 @@ export function ContactPage() {
         email: formData.email,
         phone: formData.phone || undefined,
         subject: formData.subject,
+        partnership_object: formData.partnershipObject || undefined,
+        business_sector: formData.businessSector || undefined,
         message: formData.message,
       });
 
@@ -35,7 +39,15 @@ export function ContactPage() {
         5000
       );
 
-      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+      setFormData({ 
+        name: '', 
+        email: '', 
+        phone: '', 
+        subject: '', 
+        partnershipObject: '', 
+        businessSector: '', 
+        message: '' 
+      });
     } catch (error: any) {
       console.error('Contact error:', error);
       showNotification(
@@ -124,13 +136,15 @@ export function ContactPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Téléphone
+                      Téléphone *
                     </label>
                     <input
                       type="tel"
+                      required
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="w-full px-4 py-2 bg-[#0a0e27] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                      placeholder="+243 822 201 758"
                     />
                   </div>
                   <div>
@@ -150,6 +164,34 @@ export function ContactPage() {
                       <option value="partnership">Partenariat</option>
                       <option value="other">Autre</option>
                     </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Objet du partenariat
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.partnershipObject}
+                      onChange={(e) => setFormData({ ...formData, partnershipObject: e.target.value })}
+                      className="w-full px-4 py-2 bg-[#0a0e27] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                      placeholder="Décrivez l'objet de votre partenariat"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Secteur d'action *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.businessSector}
+                      onChange={(e) => setFormData({ ...formData, businessSector: e.target.value })}
+                      className="w-full px-4 py-2 bg-[#0a0e27] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                      placeholder="Ex: Commerce, Industrie, Services..."
+                    />
                   </div>
                 </div>
 

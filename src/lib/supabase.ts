@@ -58,6 +58,8 @@ export interface ContactInsert {
   email: string;
   phone?: string;
   subject: string;
+  partnership_object?: string; // Objet du partenariat
+  business_sector?: string; // Secteur d'action
   message: string;
 }
 
