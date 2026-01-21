@@ -12,6 +12,7 @@ import { BookingPage } from './pages/BookingPage';
 import { TestimonialsPage } from './pages/TestimonialsPage';
 import { BlogPage } from './pages/BlogPage';
 import { ContactPage } from './pages/ContactPage';
+import { SalonsPage } from './pages/SalonsPage';
 
 // Component to handle scroll to top on route change
 function ScrollToTop() {
@@ -38,6 +39,7 @@ function AppContent() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/tours" element={<ToursPage />} />
             <Route path="/booking" element={<BookingPage />} />
+            <Route path="/salons" element={<SalonsPage />} />
             <Route path="/testimonials" element={<TestimonialsPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/contact" element={<ContactPage />} />

@@ -13,6 +13,7 @@ export function Navigation() {
     { path: '/about', label: t('nav.about') },
     { path: '/tours', label: t('nav.tours') },
     { path: '/booking', label: t('nav.booking') },
+    { path: '/salons', label: t('nav.salons') },
     { path: '/testimonials', label: t('nav.testimonials') },
     { path: '/blog', label: t('nav.blog') },
     { path: '/contact', label: t('nav.contact') },
