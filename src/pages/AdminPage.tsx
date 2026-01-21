@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
-import type { Booking, Tour } from '../lib/supabase';
+import type { Booking } from '../types';
 import { Calendar, Users, DollarSign, Mail, Phone, Building2, LogOut, CheckCircle, XCircle, Clock } from 'lucide-react';
 
 interface AdminPageProps {
@@ -9,7 +9,7 @@ interface AdminPageProps {
 }
 
 type BookingRow = Booking & { 
-  tour?: Tour; 
+  // Champs complémentaires pour la nouvelle structure de table
   payment_status?: string;
   is_multi_tour?: boolean;
   tours?: Array<{
@@ -46,10 +46,7 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
     try {
       const { data, error } = await supabase
         .from('bookings')
-        .select(`
-          *,
-          tour:tours(*)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
