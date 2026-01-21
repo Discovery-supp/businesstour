@@ -136,10 +136,6 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
     );
   }
 
-  if (!isAdmin) {
-    return null;
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white shadow-sm border-b">
