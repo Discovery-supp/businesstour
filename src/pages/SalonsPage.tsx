@@ -1,4 +1,4 @@
-import { Calendar, MapPin, Users, Globe, Building2 } from 'lucide-react';
+import { Calendar, MapPin, Users, Globe } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 interface Salon {
