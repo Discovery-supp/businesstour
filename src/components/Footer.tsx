@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram, Briefcase } from 'lucide-react';
+import { Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram, Briefcase, MessageCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useNotification } from '../context/NotificationContext';
 import { subscribeNewsletter } from '../lib/supabase';
@@ -64,6 +64,17 @@ export function Footer() {
               <li className="flex items-start space-x-2">
                 <MapPin className="w-5 h-5 mt-0.5" />
                 <span className="text-sm">Global Offices</span>
+              </li>
+              <li className="flex items-start space-x-2">
+                <MessageCircle className="w-5 h-5 mt-0.5 text-[#25D366]" />
+                <a
+                  href={`https://wa.me/${(import.meta.env.VITE_WHATSAPP_NUMBER || '+243822201758').replace(/[^0-9+]/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm hover:text-[#25D366] transition-colors"
+                >
+                  WhatsApp
+                </a>
               </li>
             </ul>
           </div>

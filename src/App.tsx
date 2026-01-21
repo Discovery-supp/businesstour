@@ -6,6 +6,7 @@ import { AuthProvider } from './context/AuthContext';
 import { NotificationContainer } from './components/Notification';
 import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
+import { WhatsAppButton } from './components/WhatsAppButton';
 import { HomePage } from './pages/HomePage';
 import { AboutPage } from './pages/AboutPage';
 import { ToursPage } from './pages/ToursPage';
@@ -49,6 +50,7 @@ function AppContent() {
           </Routes>
         </main>
         <Footer />
+        <WhatsAppButton />
         <NotificationContainer
           notifications={notifications}
           onClose={removeNotification}
