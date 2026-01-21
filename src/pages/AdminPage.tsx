@@ -601,7 +601,10 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                     <td className="px-6 py-4">
                       <select
                         value={displayStatus}
-                        onChange={(e) => updateBookingStatus(booking.id, e.target.value)}
+                        onChange={(e) => {
+                          const newStatus = e.target.value;
+                          updateBookingStatus(booking.id, newStatus);
+                        }}
                         disabled={displayStatus === 'completed' || displayStatus === 'confirmed'}
                         className={`text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                           displayStatus === 'completed' || displayStatus === 'confirmed'
