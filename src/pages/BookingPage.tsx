@@ -41,6 +41,10 @@ export function BookingPage() {
     travelType: 'business',
     wantsExtension: false,
     extensionDays: 0,
+    // Nouveaux champs personnels
+    personName: '',
+    gender: '' as 'male' | 'female' | 'other' | 'prefer_not_to_say' | '',
+    businessSector: '',
   });
 
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -176,11 +180,17 @@ export function BookingPage() {
     const newErrors: Record<string, string> = {};
 
     // Validate required fields
+    const personNameError = validateRequired(formData.personName, 'Nom de la personne');
+    if (personNameError) newErrors.personName = personNameError;
+
     const companyError = validateRequired(formData.companyName, 'Société');
     if (companyError) newErrors.companyName = companyError;
 
     const positionError = validateRequired(formData.position, 'Poste');
     if (positionError) newErrors.position = positionError;
+
+    const businessSectorError = validateRequired(formData.businessSector, 'Secteur d\'activité');
+    if (businessSectorError) newErrors.businessSector = businessSectorError;
 
     const emailError = validateEmail(formData.email);
     if (emailError) newErrors.email = emailError;
@@ -332,6 +342,10 @@ export function BookingPage() {
       tours: toursDetails,
       amount_paid: totalPaid,
       remaining_amount: totalRemaining,
+      // Nouveaux champs personnels
+      person_name: formData.personName || undefined,
+      gender: formData.gender || undefined,
+      business_sector: formData.businessSector || undefined,
     };
 
     setBookingData(booking);
@@ -472,6 +486,9 @@ export function BookingPage() {
         travelType: 'business',
         wantsExtension: false,
         extensionDays: 0,
+        personName: '',
+        gender: '',
+        businessSector: '',
       });
       setParticipants([]);
       setErrors({});
@@ -528,6 +545,9 @@ export function BookingPage() {
         travelType: 'business',
         wantsExtension: false,
         extensionDays: 0,
+        personName: '',
+        gender: '',
+        businessSector: '',
       });
       setParticipants([]);
       setErrors({});
@@ -579,6 +599,29 @@ export function BookingPage() {
                 {t('booking.personal')}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Nom de la personne *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.personName}
+                    onChange={(e) => {
+                      setFormData({ ...formData, personName: e.target.value });
+                      if (errors.personName) {
+                        setErrors({ ...errors, personName: '' });
+                      }
+                    }}
+                    className={`w-full px-4 py-2 bg-[#0a0e27] border ${
+                      errors.personName ? 'border-red-500' : 'border-gray-700'
+                    } text-white rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent`}
+                    placeholder="Votre nom complet"
+                  />
+                  {errors.personName && (
+                    <p className="mt-1 text-sm text-red-400">{errors.personName}</p>
+                  )}
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     {t('booking.company')} *
@@ -665,6 +708,53 @@ export function BookingPage() {
                   />
                   {errors.phone && (
                     <p className="mt-1 text-sm text-red-400">{errors.phone}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Genre
+                  </label>
+                  <select
+                    value={formData.gender}
+                    onChange={(e) => {
+                      setFormData({ ...formData, gender: e.target.value as 'male' | 'female' | 'other' | 'prefer_not_to_say' | '' });
+                      if (errors.gender) {
+                        setErrors({ ...errors, gender: '' });
+                      }
+                    }}
+                    className="w-full px-4 py-2 bg-[#0a0e27] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  >
+                    <option value="">Sélectionner</option>
+                    <option value="male">Homme</option>
+                    <option value="female">Femme</option>
+                    <option value="other">Autre</option>
+                    <option value="prefer_not_to_say">Préfère ne pas dire</option>
+                  </select>
+                  {errors.gender && (
+                    <p className="mt-1 text-sm text-red-400">{errors.gender}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Secteur d'activité *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.businessSector}
+                    onChange={(e) => {
+                      setFormData({ ...formData, businessSector: e.target.value });
+                      if (errors.businessSector) {
+                        setErrors({ ...errors, businessSector: '' });
+                      }
+                    }}
+                    className={`w-full px-4 py-2 bg-[#0a0e27] border ${
+                      errors.businessSector ? 'border-red-500' : 'border-gray-700'
+                    } text-white rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent`}
+                    placeholder="Ex: Commerce, Industrie, Services..."
+                  />
+                  {errors.businessSector && (
+                    <p className="mt-1 text-sm text-red-400">{errors.businessSector}</p>
                   )}
                 </div>
                 <div>

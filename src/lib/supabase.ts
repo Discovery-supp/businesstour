@@ -47,6 +47,10 @@ export interface BookingInsert {
   tours?: TourDetail[]; // Détails de tous les tours
   amount_paid?: number; // Montant total payé (70%)
   remaining_amount?: number; // Montant total restant (30%)
+  // Nouveaux champs personnels
+  person_name?: string;
+  gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say';
+  business_sector?: string;
 }
 
 export interface ContactInsert {
