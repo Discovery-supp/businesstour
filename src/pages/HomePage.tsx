@@ -184,6 +184,7 @@ export function HomePage() {
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: 'url(/images/conference-background.jpg)',
+            filter: 'blur(2px)',
           }}
         >
           {/* Overlay sombre pour améliorer la lisibilité du texte */}
