@@ -86,8 +86,23 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
         .update({ status: newStatus, updated_at: new Date().toISOString() })
         .eq('id', bookingId);
 
-      if (error) throw error;
-      fetchBookings();
+      if (error) {
+        console.error('Error updating booking status:', error);
+        alert(`Erreur lors de la mise à jour du statut: ${error.message}`);
+        return;
+      }
+
+      // Mettre à jour immédiatement l'état local pour un feedback instantané
+      setBookings(prevBookings => 
+        prevBookings.map(booking => 
+          booking.id === bookingId 
+            ? { ...booking, status: newStatus as any }
+            : booking
+        )
+      );
+
+      // Rafraîchir depuis la base de données pour s'assurer de la synchronisation
+      await fetchBookings();
     } catch (error) {
       console.error('Error updating booking:', error);
       alert('Erreur lors de la mise à jour du statut');
@@ -136,17 +151,18 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
 
   const stats = {
     total: bookings.length,
+    // "En attente" = réservations avec payment_status = 'pending'
     pending: bookings.filter(
-      (b) => b.payment_status === 'pending' || b.status === 'pending'
+      (b) => b.payment_status === 'pending'
     ).length,
     confirmed: bookings.filter(
       (b) => b.status === 'confirmed'
     ).length,
     completed: bookings.filter(
-      (b) => b.payment_status === 'succeeded' || b.status === 'completed'
+      (b) => b.status === 'completed'
     ).length,
     inProgress: bookings.filter(
-      (b) => b.payment_status === 'pending' || b.status === 'pending'
+      (b) => b.status === 'pending' || b.payment_status === 'pending'
     ).length,
   };
 
@@ -455,24 +471,26 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                     totalRemaining = booking.remaining_amount ?? Math.max(baseTotal - totalPaid, 0);
                   }
 
-                  const paymentStatus = booking.payment_status;
+                  // Priorité au statut manuel (status) plutôt qu'au statut de paiement
+                  // Si status est défini et valide, on l'utilise
+                  // Sinon, on se base sur payment_status
                   let displayStatus: 'pending' | 'confirmed' | 'completed' | 'cancelled' = 'pending';
-
-                  if (paymentStatus === 'succeeded') {
-                    displayStatus = 'completed';
-                  } else if (paymentStatus === 'pending') {
-                    displayStatus = 'pending';
-                  } else if (paymentStatus === 'failed' || paymentStatus === 'canceled') {
-                    displayStatus = 'cancelled';
-                  } else if (
-                    booking.status &&
-                    ['pending', 'confirmed', 'completed', 'cancelled'].includes(booking.status)
-                  ) {
-                    displayStatus = booking.status as
-                      | 'pending'
-                      | 'confirmed'
-                      | 'completed'
-                      | 'cancelled';
+                  
+                  // Vérifier d'abord le statut manuel (status)
+                  const bookingStatus = booking.status as string | undefined;
+                  if (bookingStatus && ['pending', 'confirmed', 'completed', 'cancelled'].includes(bookingStatus)) {
+                    // Le statut manuel a la priorité
+                    displayStatus = bookingStatus as 'pending' | 'confirmed' | 'completed' | 'cancelled';
+                  } else {
+                    // Fallback sur payment_status si status n'est pas défini
+                    const paymentStatus = booking.payment_status;
+                    if (paymentStatus === 'succeeded') {
+                      displayStatus = 'completed';
+                    } else if (paymentStatus === 'pending') {
+                      displayStatus = 'pending';
+                    } else if (paymentStatus === 'failed' || paymentStatus === 'canceled') {
+                      displayStatus = 'cancelled';
+                    }
                   }
 
                   return (
