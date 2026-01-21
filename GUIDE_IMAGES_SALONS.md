@@ -2,7 +2,9 @@
 
 ## 📁 Emplacement des Images
 
-Placez vos images dans le dossier : `src/assets/salons/`
+Placez vos images dans le dossier : `public/salons/`
+
+**Note** : Les images dans le dossier `public` sont accessibles directement via l'URL `/salons/nom-image.jpg`
 
 ## 📝 Format des Images
 
@@ -26,7 +28,7 @@ Nommez vos images selon cette convention :
 
 2. **Placez-les dans le dossier** :
    ```
-   src/assets/salons/
+   public/salons/
    ├── salon-1.jpg
    ├── salon-2.jpg
    ├── salon-3.jpg
@@ -40,7 +42,7 @@ Nommez vos images selon cette convention :
 
 ## 🔧 Utilisation avec Vite
 
-Vite gère automatiquement les images dans le dossier `src/assets/`. Les images seront optimisées et copiées dans le build final.
+Les images dans le dossier `public/` sont servies directement et accessibles via des chemins absolus (commençant par `/`). Elles ne sont pas optimisées par Vite, mais sont plus faciles à gérer et à remplacer.
 
 ## 💡 Alternative : Images Externes
 

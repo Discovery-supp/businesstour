@@ -26,7 +26,7 @@ const salons: Salon[] = [
     date: 'Mars 2026',
     description: 'Le plus grand salon industriel de la région, réunissant des milliers d\'entreprises et d\'investisseurs.',
     descriptionEn: 'The largest industrial fair in the region, bringing together thousands of companies and investors.',
-    image: 'salon-1.jpg', // Remplacez par le chemin de votre image
+    image: 'salon-1.jpg',
     category: 'salon',
     participants: 50000,
     website: 'https://example.com',
@@ -40,7 +40,7 @@ const salons: Salon[] = [
     date: 'Avril 2026',
     description: 'Plateforme majeure pour le commerce international et les opportunités d\'affaires B2B.',
     descriptionEn: 'Major platform for international trade and B2B business opportunities.',
-    image: 'salon-1.jpg', // Remplacez par le chemin de votre image
+    image: 'salon-2.jpg',
     category: 'foire',
     participants: 75000,
     website: 'https://example.com',
@@ -54,7 +54,7 @@ const salons: Salon[] = [
     date: 'Juin 2026',
     description: 'Découvrez les dernières innovations technologiques et rencontrez les leaders de l\'industrie.',
     descriptionEn: 'Discover the latest technological innovations and meet industry leaders.',
-    image: 'salon-1.jpg', // Remplacez par le chemin de votre image
+    image: 'salon-3.jpg',
     category: 'salon',
     participants: 100000,
     website: 'https://example.com',
@@ -68,7 +68,7 @@ const salons: Salon[] = [
     date: 'Octobre 2026',
     description: 'Événement phare pour les entreprises africaines et internationales.',
     descriptionEn: 'Flagship event for African and international businesses.',
-    image: 'salon-1.jpg', // Remplacez par le chemin de votre image
+    image: 'salon-4.jpg',
     category: 'foire',
     participants: 30000,
     website: 'https://example.com',
@@ -82,7 +82,7 @@ const salons: Salon[] = [
     date: 'Novembre 2026',
     description: 'Rencontrez les experts de l\'énergie renouvelable et des technologies vertes.',
     descriptionEn: 'Meet renewable energy and green technology experts.',
-    image: 'salon-1.jpg', // Remplacez par le chemin de votre image
+    image: 'salon-5.jpg',
     category: 'salon',
     participants: 40000,
     website: 'https://example.com',
@@ -96,7 +96,7 @@ const salons: Salon[] = [
     date: 'Décembre 2026',
     description: 'Le rendez-vous incontournable pour l\'industrie agroalimentaire mondiale.',
     descriptionEn: 'The must-attend event for the global food and agriculture industry.',
-    image: 'salon-1.jpg', // Remplacez par le chemin de votre image
+    image: 'salon-6.jpg',
     category: 'foire',
     participants: 60000,
     website: 'https://example.com',
@@ -136,22 +136,23 @@ export function SalonsPage() {
                 {/* Image */}
                 <div className="relative h-48 bg-gradient-to-br from-pink-500/20 to-purple-600/20 overflow-hidden">
                   <img
-                    src={`/src/assets/salons/${salon.image}`}
+                    src={`/salons/${salon.image}`}
                     alt={isFrench ? salon.name : salon.nameEn}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      // Fallback si l'image ne charge pas
+                      // Fallback si l'image ne charge pas - affiche un placeholder avec gradient
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
                       const parent = target.parentElement;
-                      if (parent) {
-                        parent.innerHTML = `
-                          <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-pink-500/30 to-purple-600/30">
-                            <svg class="w-16 h-16 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                            </svg>
-                          </div>
+                      if (parent && !parent.querySelector('.fallback-placeholder')) {
+                        const fallback = document.createElement('div');
+                        fallback.className = 'fallback-placeholder w-full h-full flex items-center justify-center bg-gradient-to-br from-pink-500/30 to-purple-600/30';
+                        fallback.innerHTML = `
+                          <svg class="w-16 h-16 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                          </svg>
                         `;
+                        parent.appendChild(fallback);
                       }
                     }}
                   />
