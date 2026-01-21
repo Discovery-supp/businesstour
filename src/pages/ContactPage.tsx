@@ -73,7 +73,7 @@ export function ContactPage() {
 
       <section className="py-20 bg-[#0a0e27]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <div className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-pink-500 transition-all text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-pink-500/20 to-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Mail className="w-8 h-8 text-pink-500" />
@@ -90,6 +90,21 @@ export function ContactPage() {
               <h3 className="text-xl font-bold text-white mb-2">Téléphone</h3>
               <p className="text-gray-400">+243 822 201 758</p>
               <p className="text-gray-400">+243 979 490 002</p>
+            </div>
+
+            <div className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-[#25D366] transition-all text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-[#25D366]/20 to-[#20BA5A]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="w-8 h-8 text-[#25D366]" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">WhatsApp</h3>
+              <a
+                href={`https://wa.me/${(import.meta.env.VITE_WHATSAPP_NUMBER || '+243822201758').replace(/[^0-9+]/g, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#25D366] hover:text-[#20BA5A] transition-colors font-semibold inline-block"
+              >
+                Nous contacter
+              </a>
             </div>
 
             <div className="bg-gray-900 p-8 rounded-xl border border-gray-800 hover:border-pink-500 transition-all text-center">
