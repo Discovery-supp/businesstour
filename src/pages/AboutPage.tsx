@@ -17,14 +17,19 @@ export function AboutPage() {
               </p>
             </div>
             <div className="relative">
-              <img
-                src="/images/about-image.jpg"
-                alt="Business Tours Team"
-                className="rounded-xl border border-gray-800 shadow-2xl w-full h-auto object-cover"
-                style={{
-                  filter: 'blur(1px)',
-                }}
-              />
+              <div className="relative rounded-xl border border-gray-800 shadow-2xl overflow-hidden">
+                <img
+                  src="/images/about-image.jpg"
+                  alt="Business Tours Team"
+                  className="w-full h-auto object-cover"
+                  style={{
+                    filter: 'blur(1px)',
+                    opacity: 0.85,
+                  }}
+                />
+                {/* Overlay sombre pour augmenter l'opacité */}
+                <div className="absolute inset-0 bg-black/30"></div>
+              </div>
             </div>
           </div>
         </div>
