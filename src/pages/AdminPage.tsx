@@ -48,6 +48,8 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loginLoading, setLoginLoading] = useState(false);
+  const [editingBooking, setEditingBooking] = useState<BookingRow | null>(null);
+  const [editFormData, setEditFormData] = useState<any>({});
 
   useEffect(() => {
     if (isAdmin) {
@@ -90,6 +92,56 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
       fetchBookings();
     } catch (error) {
       console.error('Error updating booking:', error);
+    }
+  };
+
+  const handleEditBooking = (booking: BookingRow) => {
+    setEditingBooking(booking);
+    // Initialiser les données du formulaire avec les valeurs actuelles
+    setEditFormData({
+      company_name: booking.company_name || booking.company || '',
+      email: booking.email || '',
+      phone: booking.phone || '',
+      num_participants: booking.num_participants || 1,
+      total_amount: booking.total_amount || 0,
+      amount_paid: booking.amount_paid || 0,
+      remaining_amount: booking.remaining_amount || 0,
+      status: booking.status || 'pending',
+      payment_status: booking.payment_status || 'pending',
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingBooking) return;
+
+    try {
+      const updateData: any = {
+        company_name: editFormData.company_name,
+        email: editFormData.email,
+        phone: editFormData.phone,
+        num_participants: editFormData.num_participants,
+        total_amount: editFormData.total_amount,
+        amount_paid: editFormData.amount_paid,
+        remaining_amount: editFormData.remaining_amount,
+        status: editFormData.status,
+        payment_status: editFormData.payment_status,
+        updated_at: new Date().toISOString(),
+      };
+
+      const { error } = await supabase
+        .from('bookings')
+        .update(updateData)
+        .eq('id', editingBooking.id);
+
+      if (error) throw error;
+
+      setEditingBooking(null);
+      setEditFormData({});
+      fetchBookings();
+      alert('Réservation mise à jour avec succès');
+    } catch (error) {
+      console.error('Error updating booking:', error);
+      alert('Erreur lors de la mise à jour de la réservation');
     }
   };
 
@@ -414,7 +466,6 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Prix par personne</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Prix Total</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Payé / Reste</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Mode de paiement</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
                 </tr>
@@ -578,38 +629,29 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        booking.payment_method === 'cash'
-                          ? 'bg-green-100 text-green-800 border border-green-200'
-                          : 'bg-blue-100 text-blue-800 border border-blue-200'
-                      }`}>
-                        {booking.payment_method === 'cash' ? (
-                          <>
-                            <span className="mr-1">💵</span>
-                            Cash
-                          </>
-                        ) : (
-                          <>
-                            <span className="mr-1">💳</span>
-                            Stripe
-                          </>
-                        )}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
                       {getStatusBadge(displayStatus)}
                     </td>
                     <td className="px-6 py-4">
-                      <select
-                        value={displayStatus}
-                        onChange={(e) => updateBookingStatus(booking.id, e.target.value)}
-                        className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      >
-                        <option value="pending">En attente</option>
-                        <option value="confirmed">Confirmée</option>
-                        <option value="completed">Complétée</option>
-                        <option value="cancelled">Annulée</option>
-                      </select>
+                      <div className="flex flex-col gap-2">
+                        <select
+                          value={displayStatus}
+                          onChange={(e) => updateBookingStatus(booking.id, e.target.value)}
+                          className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          <option value="pending">En attente</option>
+                          <option value="confirmed">Confirmée</option>
+                          <option value="completed">Complétée</option>
+                          <option value="cancelled">Annulée</option>
+                        </select>
+                        {(displayStatus === 'completed' || displayStatus === 'confirmed') && (
+                          <button
+                            onClick={() => handleEditBooking(booking)}
+                            className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg transition"
+                          >
+                            Modifier
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 )})}
@@ -723,6 +765,161 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
           </button>
         </div>
       </div>
+
+      {/* Modal d'édition */}
+      {editingBooking && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900">Modifier la réservation</h2>
+              <p className="text-sm text-gray-600 mt-1">ID: {editingBooking.id}</p>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nom de l'entreprise
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.company_name || ''}
+                  onChange={(e) => setEditFormData({ ...editFormData, company_name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={editFormData.email || ''}
+                  onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Téléphone
+                </label>
+                <input
+                  type="tel"
+                  value={editFormData.phone || ''}
+                  onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nombre de participants
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={editFormData.num_participants || 1}
+                  onChange={(e) => setEditFormData({ ...editFormData, num_participants: parseInt(e.target.value) || 1 })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Prix total ($)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={editFormData.total_amount || 0}
+                  onChange={(e) => setEditFormData({ ...editFormData, total_amount: parseFloat(e.target.value) || 0 })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Montant payé ($)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={editFormData.amount_paid || 0}
+                  onChange={(e) => setEditFormData({ ...editFormData, amount_paid: parseFloat(e.target.value) || 0 })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Montant restant ($)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={editFormData.remaining_amount || 0}
+                  onChange={(e) => setEditFormData({ ...editFormData, remaining_amount: parseFloat(e.target.value) || 0 })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Statut
+                </label>
+                <select
+                  value={editFormData.status || 'pending'}
+                  onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="pending">En attente</option>
+                  <option value="confirmed">Confirmée</option>
+                  <option value="completed">Complétée</option>
+                  <option value="cancelled">Annulée</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Statut de paiement
+                </label>
+                <select
+                  value={editFormData.payment_status || 'pending'}
+                  onChange={(e) => setEditFormData({ ...editFormData, payment_status: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="pending">En attente</option>
+                  <option value="succeeded">Réussi</option>
+                  <option value="failed">Échoué</option>
+                  <option value="canceled">Annulé</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setEditingBooking(null);
+                  setEditFormData({});
+                }}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
+              >
+                Enregistrer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
