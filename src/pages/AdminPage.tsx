@@ -24,11 +24,25 @@ type BookingRow = Booking & {
   remaining_amount?: number;
 };
 
+type ContactRow = {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string | null;
+  subject: string;
+  partnership_object?: string | null;
+  business_sector?: string | null;
+  message: string;
+  created_at?: string;
+};
+
 export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
   const { user, isAdmin, loading: authLoading, signOut, signIn } = useAuth();
   const [bookings, setBookings] = useState<BookingRow[]>([]);
+  const [contacts, setContacts] = useState<ContactRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<'bookings' | 'contacts'>('bookings');
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -37,6 +51,7 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
   useEffect(() => {
     if (isAdmin) {
       fetchBookings();
+      fetchContacts();
     } else {
       setLoading(false);
     }
@@ -91,6 +106,24 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
       setLoginError('Identifiants invalides ou accès non autorisé.');
     }
     setLoginLoading(false);
+  };
+
+  const fetchContacts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('contacts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Admin fetchContacts error:', error);
+        return;
+      }
+
+      setContacts((data || []) as ContactRow[]);
+    } catch (error) {
+      console.error('Error fetching contacts:', error);
+    }
   };
 
   const filteredBookings = filter === 'all'
@@ -298,6 +331,31 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
           </div>
         </div>
 
+        {/* Onglets Réservations / Contacts */}
+        <div className="mb-6 flex gap-3">
+          <button
+            onClick={() => setActiveTab('bookings')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium border transition ${
+              activeTab === 'bookings'
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            Réservations
+          </button>
+          <button
+            onClick={() => setActiveTab('contacts')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium border transition ${
+              activeTab === 'contacts'
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            Contacts ({contacts.length})
+          </button>
+        </div>
+
+        {activeTab === 'bookings' && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
             <div className="flex flex-wrap gap-2">
@@ -545,6 +603,94 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
             )}
           </div>
         </div>
+        )}
+
+        {activeTab === 'contacts' && (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">Messages de contact</h2>
+              <p className="text-sm text-gray-600 mt-1">
+                Liste des personnes qui ont rempli le formulaire de contact.
+              </p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Nom / Email
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Téléphone
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Objet
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Objet du partenariat
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Secteur d'action
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Message
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {contacts.map((contact) => (
+                    <tr key={contact.id}>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col">
+                          <span className="font-medium text-gray-900">{contact.name}</span>
+                          <div className="flex items-center gap-1 text-sm text-gray-600 mt-1">
+                            <Mail className="w-3 h-3" />
+                            {contact.email}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {contact.phone || '-'}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {contact.subject}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {contact.partnership_object || '-'}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {contact.business_sector || '-'}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700 max-w-xs">
+                        <div className="line-clamp-3 whitespace-pre-line">
+                          {contact.message}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-xs text-gray-500">
+                        {contact.created_at
+                          ? new Date(contact.created_at).toLocaleDateString()
+                          : '-'}
+                      </td>
+                    </tr>
+                  ))}
+                  {contacts.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={7}
+                        className="px-6 py-8 text-center text-gray-500 text-sm"
+                      >
+                        Aucun contact pour le moment.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         {/* Bouton de déconnexion bien visible en bas de page admin */}
         <div className="mt-8 flex justify-end">

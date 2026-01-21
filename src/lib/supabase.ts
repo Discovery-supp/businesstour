@@ -103,12 +103,13 @@ export async function createContact(contact: ContactInsert) {
 
   if (error) {
     console.error('Supabase contact error:', error);
-    // Check if table doesn't exist
-    if (error.message.includes('schema cache') || error.message.includes('does not exist')) {
+    // Si la table contacts n'existe pas encore
+    if (error.message.includes('schema cache')) {
       throw new Error(
         'Les tables Supabase n\'ont pas été créées. Veuillez exécuter le script SQL dans Supabase (voir supabase-schema.sql)'
       );
     }
+    // Pour les autres erreurs (ex: colonne manquante), renvoyer le message exact
     throw new Error(`Erreur lors de l'envoi du message: ${error.message}`);
   }
 
