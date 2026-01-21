@@ -101,10 +101,18 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
 
   const stats = {
     total: bookings.length,
-    pending: bookings.filter(b => b.status === 'pending').length,
-    confirmed: bookings.filter(b => b.status === 'confirmed').length,
-    completed: bookings.filter(b => b.status === 'completed').length,
-    inProgress: bookings.filter(b => b.status === 'pending' || b.payment_status === 'pending').length,
+    pending: bookings.filter(
+      (b) => b.payment_status === 'pending' || b.status === 'pending'
+    ).length,
+    confirmed: bookings.filter(
+      (b) => b.status === 'confirmed'
+    ).length,
+    completed: bookings.filter(
+      (b) => b.payment_status === 'succeeded' || b.status === 'completed'
+    ).length,
+    inProgress: bookings.filter(
+      (b) => b.payment_status === 'pending' || b.status === 'pending'
+    ).length,
   };
 
   const getStatusBadge = (status: string) => {
@@ -354,7 +362,47 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {filteredBookings.map((booking) => (
+                {filteredBookings.map((booking) => {
+                  const participants =
+                    booking.num_participants || (booking as any).numParticipants || 1;
+
+                  const hasTours = booking.is_multi_tour && booking.tours && booking.tours.length > 0;
+
+                  const baseTotal = hasTours
+                    ? booking.tours!.reduce((sum, tour) => sum + (tour.price || 0), 0) * participants
+                    : (booking.total_amount as number | undefined) ??
+                      ((booking as any).totalAmount as number | undefined) ??
+                      0;
+
+                  const totalPaid = hasTours
+                    ? booking.tours!.reduce((sum, tour) => sum + (tour.amount_paid || 0), 0)
+                    : booking.amount_paid ?? 0;
+
+                  let totalRemaining =
+                    booking.remaining_amount ??
+                    Math.max(baseTotal - totalPaid, 0);
+
+                  const paymentStatus = booking.payment_status;
+                  let displayStatus: 'pending' | 'confirmed' | 'completed' | 'cancelled' = 'pending';
+
+                  if (paymentStatus === 'succeeded') {
+                    displayStatus = 'completed';
+                  } else if (paymentStatus === 'pending') {
+                    displayStatus = 'pending';
+                  } else if (paymentStatus === 'failed' || paymentStatus === 'canceled') {
+                    displayStatus = 'cancelled';
+                  } else if (
+                    booking.status &&
+                    ['pending', 'confirmed', 'completed', 'cancelled'].includes(booking.status)
+                  ) {
+                    displayStatus = booking.status as
+                      | 'pending'
+                      | 'confirmed'
+                      | 'completed'
+                      | 'cancelled';
+                  }
+
+                  return (
                   <tr key={booking.id} className="hover:bg-gray-50 transition">
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
@@ -404,19 +452,19 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                       <div className="flex items-center gap-1">
                         <DollarSign className="w-4 h-4 text-gray-500" />
                         <span className="text-sm font-semibold text-gray-900">
-                          ${(booking.total_amount || booking.totalAmount || 0).toLocaleString()}
+                          ${baseTotal.toLocaleString()}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col gap-1">
                         <div className="text-xs text-green-600 font-semibold">
-                          Payé: ${(booking.amount_paid || 0).toLocaleString()}
+                          Payé: ${totalPaid.toLocaleString()}
                         </div>
                         <div className="text-xs text-orange-600 font-semibold">
-                          Reste: ${(booking.remaining_amount || 0).toLocaleString()}
+                          Reste: ${totalRemaining.toLocaleString()}
                         </div>
-                        {booking.is_multi_tour && booking.tours && (
+                        {hasTours && booking.tours && (
                           <details className="mt-1">
                             <summary className="text-xs text-gray-500 cursor-pointer">Détails par tour</summary>
                             <div className="mt-1 space-y-1">
@@ -433,11 +481,11 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      {getStatusBadge(booking.status)}
+                      {getStatusBadge(displayStatus)}
                     </td>
                     <td className="px-6 py-4">
                       <select
-                        value={booking.status}
+                        value={displayStatus}
                         onChange={(e) => updateBookingStatus(booking.id, e.target.value)}
                         className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
@@ -448,7 +496,7 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                       </select>
                     </td>
                   </tr>
-                ))}
+                )})}
               </tbody>
             </table>
 
