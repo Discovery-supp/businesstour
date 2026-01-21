@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Test Email</title>
+</head>
+<body>
+  <h1>Test d'envoi d'email</h1>
+  <button onclick="sendTestEmail()">Envoyer un email de test</button>
+  <div id="result" style="margin-top: 20px;"></div>
+
+  <script>
+    async function sendTestEmail() {
+      const email = 'scongodiscovery18@gmail.com';
+      const resultDiv = document.getElementById('result');
+      
+      resultDiv.innerHTML = 'Envoi en cours...';
+      
+      try {
+        // Déterminer l'URL de base pour les fonctions Netlify
+        const functionsBase = import.meta.env?.VITE_FUNCTIONS_BASE || '';
+        const functionsUrl = `${functionsBase}/.netlify/functions/test-email`;
+        
+        const response = await fetch(functionsUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+          resultDiv.innerHTML = `
+            <div style="color: green; padding: 10px; background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 5px;">
+              ✅ Email envoyé avec succès !<br>
+              Message ID: ${data.messageId || 'N/A'}<br>
+              Vérifiez la boîte de réception de ${email}
+            </div>
+          `;
+        } else {
+          resultDiv.innerHTML = `
+            <div style="color: red; padding: 10px; background: #fef2f2; border: 1px solid #ef4444; border-radius: 5px;">
+              ❌ Erreur: ${data.error || 'Erreur inconnue'}<br>
+              ${data.details ? JSON.stringify(data.details, null, 2) : ''}
+            </div>
+          `;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `
+          <div style="color: red; padding: 10px; background: #fef2f2; border: 1px solid #ef4444; border-radius: 5px;">
+            ❌ Erreur de connexion: ${error.message}<br>
+            Assurez-vous que les variables d'environnement RESEND_API_KEY et RESEND_FROM_EMAIL sont configurées.
+          </div>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
