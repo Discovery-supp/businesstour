@@ -45,7 +45,7 @@ export function ToursPage() {
     {
       destination: 'Turquie',
       tourType: 'Basique',
-      price: 1500,
+      price: 1600,
       inclusions: [
         '7 nuits en hôtel (petits-déjeuners inclus)',
         'Accès aux conférences et ateliers',
@@ -58,7 +58,7 @@ export function ToursPage() {
     {
       destination: 'Dubai',
       tourType: 'VIP',
-      price: 1200,
+      price: 1000,
       inclusions: [
         'Assistance pour les visas UAE',
         '7 nuits en hôtel (petits-déjeuners inclus)',
@@ -76,7 +76,7 @@ export function ToursPage() {
     {
       destination: 'Dubai',
       tourType: 'Standard',
-      price: 1000,
+      price: 800,
       inclusions: [
         'Assistance pour les visas',
         'Accès aux conférences et ateliers',
@@ -90,7 +90,7 @@ export function ToursPage() {
     {
       destination: 'Dubai',
       tourType: 'Basique',
-      price: 800,
+      price: 700,
       inclusions: [
         '7 nuits en hôtel (petits-déjeuners inclus)',
         'Accès aux conférences et ateliers',
@@ -103,7 +103,7 @@ export function ToursPage() {
     {
       destination: 'Chine',
       tourType: 'VIP',
-      price: 2000,
+      price: 2200,
       inclusions: [
         'Assistance pour les visas Chine',
         '10 nuits en hôtel (petits-déjeuners inclus)',
@@ -121,7 +121,7 @@ export function ToursPage() {
     {
       destination: 'Chine',
       tourType: 'Standard',
-      price: 1700,
+      price: 1800,
       inclusions: [
         'Assistance pour les visas',
         'Accès aux conférences et ateliers',
@@ -135,7 +135,7 @@ export function ToursPage() {
     {
       destination: 'Chine',
       tourType: 'Basique',
-      price: 1500,
+      price: 1600,
       inclusions: [
         '10 nuits en hôtel (petits-déjeuners inclus)',
         'Accès aux conférences et ateliers',
@@ -148,7 +148,7 @@ export function ToursPage() {
     {
       destination: 'Bénin',
       tourType: 'VIP',
-      price: 800,
+      price: 700,
       inclusions: [
         'Assistance pour les visas',
         '7 nuits en hôtel (petits-déjeuners inclus)',

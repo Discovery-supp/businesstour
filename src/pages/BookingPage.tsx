@@ -62,9 +62,9 @@ export function BookingPage() {
   ];
 
   const tourTypes = [
-    { value: 'vip', label: 'VIP', prices: { turkey: 2000, dubai: 1200, china: 2000, benin: 800 } },
-    { value: 'standard', label: 'Standard', prices: { turkey: 1700, dubai: 1000, china: 1700, benin: 0 } },
-    { value: 'basic', label: 'Basique', prices: { turkey: 1500, dubai: 800, china: 1500, benin: 0 } },
+    { value: 'vip', label: 'VIP', prices: { turkey: 2000, dubai: 1000, china: 2200, benin: 700 } },
+    { value: 'standard', label: 'Standard', prices: { turkey: 1700, dubai: 800, china: 1800, benin: 0 } },
+    { value: 'basic', label: 'Basique', prices: { turkey: 1600, dubai: 700, china: 1600, benin: 0 } },
   ];
 
   const reasons = [
