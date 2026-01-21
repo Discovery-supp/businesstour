@@ -548,6 +548,16 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
             )}
           </div>
         </div>
+
+        {/* Bouton de déconnexion bien visible en bas de page admin */}
+        <div className="mt-8 flex justify-end">
+          <button
+            onClick={handleSignOut}
+            className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg shadow-sm transition"
+          >
+            Se déconnecter
+          </button>
+        </div>
       </div>
     </div>
   );
