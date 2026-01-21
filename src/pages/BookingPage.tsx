@@ -444,11 +444,55 @@ export function BookingPage() {
         console.error('Payment setup error:', error);
         setClientSecret(null);
         setIsSubmitting(false);
+        
+        // Détecter si c'est une erreur de connexion (netlify dev pas démarré)
+        const isConnectionError = error?.message?.includes('Failed to fetch') || 
+                                   error?.message?.includes('ERR_CONNECTION_REFUSED') ||
+                                   error?.name === 'TypeError';
+        
+        if (isConnectionError) {
+          // Proposer de sauvegarder avec paiement cash ou de démarrer netlify dev
+          const useCash = window.confirm(
+            'Le serveur de paiement Stripe n\'est pas disponible.\n\n' +
+            'Options:\n' +
+            '• Cliquez sur "OK" pour sauvegarder la réservation avec paiement en cash (vous serez contacté pour finaliser le paiement)\n' +
+            '• Cliquez sur "Annuler" pour démarrer le serveur Netlify (npx netlify dev) et réessayer avec Stripe'
+          );
+          
+          if (useCash) {
+            // Sauvegarder avec paiement cash
+            await saveBooking({
+              ...booking,
+              payment_method: 'cash',
+              payment_status: 'pending',
+            });
+            return;
+          } else {
+            showNotification('info', 'Veuillez démarrer le serveur Netlify avec: npx netlify dev');
+            return;
+          }
+        }
+        
         const errorMessage = error?.message || 'Erreur lors de la création du paiement';
         
-        // Ne pas faire de fallback silencieux - demander à l'utilisateur
-        showNotification('error', `${errorMessage}. La réservation n'a pas été créée. Veuillez réessayer.`);
-        return; // Ne pas sauvegarder si le paiement échoue
+        // Pour les autres erreurs, proposer aussi le fallback cash
+        const useCash = window.confirm(
+          `${errorMessage}\n\n` +
+          'Souhaitez-vous sauvegarder la réservation avec paiement en cash ?\n' +
+          '(Vous serez contacté pour finaliser le paiement)'
+        );
+        
+        if (useCash) {
+          await saveBooking({
+            ...booking,
+            payment_method: 'cash',
+            payment_status: 'pending',
+          });
+          return;
+        }
+        
+        showNotification('error', 'La réservation n\'a pas été créée. Veuillez réessayer.');
+        return;
       }
     } else {
       // Si Stripe n'est pas configuré ou montant = 0, sauvegarder directement
