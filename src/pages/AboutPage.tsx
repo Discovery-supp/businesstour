@@ -21,6 +21,9 @@ export function AboutPage() {
                 src="/images/about-image.jpg"
                 alt="Business Tours Team"
                 className="rounded-xl border border-gray-800 shadow-2xl w-full h-auto object-cover"
+                style={{
+                  filter: 'blur(1px)',
+                }}
               />
             </div>
           </div>
