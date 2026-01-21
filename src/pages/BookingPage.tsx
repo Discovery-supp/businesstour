@@ -45,6 +45,8 @@ export function BookingPage() {
     personName: '',
     gender: '' as 'male' | 'female' | 'other' | 'prefer_not_to_say' | '',
     businessSector: '',
+    // Mode de paiement
+    paymentMethod: 'stripe' as 'stripe' | 'cash',
   });
 
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -346,6 +348,8 @@ export function BookingPage() {
       person_name: formData.personName || undefined,
       gender: formData.gender || undefined,
       business_sector: formData.businessSector || undefined,
+      // Mode de paiement
+      payment_method: formData.paymentMethod,
     };
 
     setBookingData(booking);
@@ -356,6 +360,16 @@ export function BookingPage() {
       totalAmount,
       stripeKey: import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ? 'Present' : 'Missing',
     });
+
+    // Si le paiement est en cash, sauvegarder directement sans Stripe
+    if (formData.paymentMethod === 'cash') {
+      console.log('Payment method: Cash - saving booking without Stripe');
+      await saveBooking({
+        ...booking,
+        payment_status: 'pending', // En attente de confirmation du paiement cash
+      });
+      return;
+    }
 
     // Si Stripe est configuré et qu'il y a un montant à payer, créer un PaymentIntent côté serveur
     if (isStripeConfigured && totalAmount > 0) {
@@ -1219,6 +1233,53 @@ export function BookingPage() {
                   </div>
                 )}
                 
+                {/* Sélecteur de mode de paiement */}
+                <div className="mb-6 pt-4 border-t border-pink-500/20">
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
+                    Mode de paiement *
+                  </label>
+                  <div className="flex gap-4">
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="stripe"
+                        checked={formData.paymentMethod === 'stripe'}
+                        onChange={(e) =>
+                          setFormData({ ...formData, paymentMethod: e.target.value as 'stripe' | 'cash' })
+                        }
+                        className="w-4 h-4 text-pink-500 focus:ring-pink-500 focus:ring-2"
+                      />
+                      <span className="text-gray-300 flex items-center">
+                        <CreditCard className="w-4 h-4 mr-1" />
+                        Paiement en ligne (Stripe)
+                      </span>
+                    </label>
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="cash"
+                        checked={formData.paymentMethod === 'cash'}
+                        onChange={(e) =>
+                          setFormData({ ...formData, paymentMethod: e.target.value as 'stripe' | 'cash' })
+                        }
+                        className="w-4 h-4 text-pink-500 focus:ring-pink-500 focus:ring-2"
+                      />
+                      <span className="text-gray-300 flex items-center">
+                        <span className="mr-1">💵</span>
+                        Paiement en cash
+                      </span>
+                    </label>
+                  </div>
+                  {formData.paymentMethod === 'cash' && (
+                    <p className="mt-2 text-xs text-yellow-400 flex items-start space-x-1">
+                      <span>ℹ️</span>
+                      <span>Vous serez contacté pour finaliser le paiement en cash. La réservation sera confirmée après réception du paiement.</span>
+                    </p>
+                  )}
+                </div>
+                
                 <div className="pt-4 border-t border-pink-500/20">
                   <div className="flex items-start space-x-2">
                     <div className="text-yellow-400 text-lg">💰</div>
@@ -1247,6 +1308,8 @@ export function BookingPage() {
               <span>
                 {isSubmitting 
                   ? 'Envoi en cours...' 
+                  : formData.paymentMethod === 'cash'
+                  ? 'Confirmer la réservation (Paiement cash)'
                   : isStripeConfigured && calculateTotal() > 0
                   ? 'Continuer vers le Paiement'
                   : t('booking.submit')

@@ -51,6 +51,8 @@ export interface BookingInsert {
   person_name?: string;
   gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say';
   business_sector?: string;
+  // Mode de paiement
+  payment_method?: 'stripe' | 'cash';
 }
 
 export interface ContactInsert {

@@ -11,6 +11,7 @@ interface AdminPageProps {
 type BookingRow = Booking & { 
   // Champs complémentaires pour la nouvelle structure de table
   payment_status?: string;
+  payment_method?: 'stripe' | 'cash';
   is_multi_tour?: boolean;
   tours?: Array<{
     destination: string;
@@ -413,6 +414,7 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Prix par personne</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Prix Total</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Payé / Reste</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Mode de paiement</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
                 </tr>
@@ -574,6 +576,25 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                           </details>
                         )}
                       </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        booking.payment_method === 'cash'
+                          ? 'bg-green-100 text-green-800 border border-green-200'
+                          : 'bg-blue-100 text-blue-800 border border-blue-200'
+                      }`}>
+                        {booking.payment_method === 'cash' ? (
+                          <>
+                            <span className="mr-1">💵</span>
+                            Cash
+                          </>
+                        ) : (
+                          <>
+                            <span className="mr-1">💳</span>
+                            Stripe
+                          </>
+                        )}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
                       {getStatusBadge(displayStatus)}
