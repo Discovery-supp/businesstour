@@ -71,7 +71,7 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.subscribe': 'S\'abonner',
     'footer.rights': 'Tous droits réservés.',
     'about.title': 'À Propos de Business Tours',
-    'about.intro': 'Nous sommes une équipe d\'entrepreneurs passionnés qui croit fermement que l\'échange d\'expertises et la collaboration pratique constituent le levier le plus puissant pour transformer des idées audacieuses en entreprises prospères.',
+    'about.intro': 'Nous sommes une équipe d\'entrepreneurs passionnés qui croit fermement que l\'échange d\'expertises, de biens, de technologies et une collaboration pragmatique constituent le levier le plus puissant pour transformer des idées audacieuses en entreprises prospères. Depuis 2023, nous adoptons une démarche d\'innovation ouverte et de développement collaboratif, en consolidant un réseau de partenaires et d\'experts sur les marchés internationaux et en accompagnant les entrepreneurs dans la concrétisation et l\'épanouissement de leurs projets. Nous faisons du voyage d\'affaires un vecteur d\'impact positif collectif.',
     'why.title': 'Pourquoi Nous Choisir ?',
     'why.content': 'Parce que nous combinons connaissance du terrain en Afrique, réseau international, et méthode opérationnelle axée sur les performances et le suivi pour des résultats durables.',
     'join.title': 'Rejoignez-Nous',

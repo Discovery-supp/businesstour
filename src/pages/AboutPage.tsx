@@ -11,7 +11,7 @@ export function AboutPage() {
           <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('about.title')}</h1>
           <div className="w-24 h-1 bg-gradient-to-r from-pink-500 to-purple-600 mb-6"></div>
           <p className="text-xl text-gray-300 max-w-3xl">
-            {t('about.intro')}
+            Nous sommes une équipe d'entrepreneurs passionnés qui croit fermement que l'échange d'expertises, de biens, de technologies et une collaboration pragmatique constituent le levier le plus puissant pour transformer des idées audacieuses en entreprises prospères.
           </p>
         </div>
       </section>
@@ -20,16 +20,26 @@ export function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold text-white mb-6">Notre Mission</h2>
+              <h2 className="text-3xl font-bold text-white mb-6">À Propos</h2>
               <p className="text-lg text-gray-300 mb-6 leading-relaxed">
-                Nous sommes une équipe d'entrepreneurs passionnés qui croit fermement que l'échange d'expertises
-                et la collaboration pratique constituent le levier le plus puissant pour transformer des idées
-                audacieuses en entreprises prospères.
+                Nous sommes une équipe d'entrepreneurs passionnés qui croit fermement que l'échange d'expertises, de biens, de technologies et une collaboration pragmatique constituent le levier le plus puissant pour transformer des idées audacieuses en entreprises prospères. Depuis 2023, nous adoptons une démarche d'innovation ouverte et de développement collaboratif, en consolidant un réseau de partenaires et d'experts sur les marchés internationaux et en accompagnant les entrepreneurs dans la concrétisation et l'épanouissement de leurs projets. Nous faisons du voyage d'affaires un vecteur d'impact positif collectif.
               </p>
-              <p className="text-lg text-gray-300 leading-relaxed">
-                Notre approche unique combine la connaissance du terrain en Afrique avec un réseau international
-                étendu, permettant à nos clients d'accéder à des opportunités concrètes et mesurables.
-              </p>
+              
+              <h3 className="text-2xl font-bold text-white mb-4 mt-8">Notre Mission</h3>
+              <ul className="space-y-3 text-lg text-gray-300 leading-relaxed">
+                <li className="flex items-start space-x-3">
+                  <CheckCircle className="w-6 h-6 text-pink-500 flex-shrink-0 mt-1" />
+                  <span>Faciliter les échanges d'expertise et les partenariats stratégiques entre acteurs internationaux pour transformer des idées en opportunités concrètes et durables.</span>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <CheckCircle className="w-6 h-6 text-pink-500 flex-shrink-0 mt-1" />
+                  <span>Offrir des voyages d'affaires structurés qui combinent sourcing, rencontres professionnelles ciblées, visites d'entreprises et participation à des foire et salon d'affaire, afin d'accélérer la prise de décision et la croissance des participants.</span>
+                </li>
+                <li className="flex items-start space-x-3">
+                  <CheckCircle className="w-6 h-6 text-pink-500 flex-shrink-0 mt-1" />
+                  <span>Créer des opportunités d'affaires tangibles et Collaboration pratique, intégrité dans les échanges, valeur ajoutée mesurable, et impact positif pour les marchés et les communautés impliquées.</span>
+                </li>
+              </ul>
             </div>
             <div className="relative">
               <img
