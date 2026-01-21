@@ -190,9 +190,6 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
               {loginLoading ? 'Connexion...' : 'Se connecter'}
             </button>
           </form>
-          <p className="mt-4 text-xs text-gray-500">
-            L'accès est réservé aux administrateurs. Les rôles sont gérés dans la table <code>user_roles</code> de Supabase.
-          </p>
         </div>
       </div>
     );
