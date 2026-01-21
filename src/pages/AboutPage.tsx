@@ -20,11 +20,6 @@ export function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold text-white mb-6">À Propos</h2>
-              <p className="text-lg text-gray-300 mb-6 leading-relaxed">
-                Nous sommes une équipe d'entrepreneurs passionnés qui croit fermement que l'échange d'expertises, de biens, de technologies et une collaboration pragmatique constituent le levier le plus puissant pour transformer des idées audacieuses en entreprises prospères. Depuis 2023, nous adoptons une démarche d'innovation ouverte et de développement collaboratif, en consolidant un réseau de partenaires et d'experts sur les marchés internationaux et en accompagnant les entrepreneurs dans la concrétisation et l'épanouissement de leurs projets. Nous faisons du voyage d'affaires un vecteur d'impact positif collectif.
-              </p>
-              
               <h3 className="text-2xl font-bold text-white mb-4 mt-8">Notre Mission</h3>
               <ul className="space-y-3 text-lg text-gray-300 leading-relaxed">
                 <li className="flex items-start space-x-3">
