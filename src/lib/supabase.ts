@@ -88,6 +88,30 @@ export async function createBooking(booking: BookingInsert) {
     throw new Error(`Erreur lors de la création de la réservation: ${error.message}`);
   }
 
+  // Envoyer l'email de confirmation de manière asynchrone (ne pas bloquer si l'email échoue)
+  if (data && data.email) {
+    try {
+      const functionsBase = import.meta.env.VITE_FUNCTIONS_BASE || '';
+      const functionsUrl = `${functionsBase}/.netlify/functions/send-booking-confirmation`;
+      
+      // Appel asynchrone sans attendre la réponse
+      fetch(functionsUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...booking,
+          id: data.id,
+        }),
+      }).catch(err => {
+        console.warn('Failed to send confirmation email (non-blocking):', err);
+      });
+    } catch (err) {
+      console.warn('Error setting up email confirmation (non-blocking):', err);
+    }
+  }
+
   return data;
 }
 
