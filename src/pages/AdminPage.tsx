@@ -52,7 +52,12 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Admin fetchBookings error:', error);
+        throw error;
+      }
+
+      console.log('Admin fetchBookings data:', data);
       setBookings(data || []);
     } catch (error) {
       console.error('Error fetching bookings:', error);
