@@ -605,9 +605,9 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                           const newStatus = e.target.value;
                           updateBookingStatus(booking.id, newStatus);
                         }}
-                        disabled={displayStatus === 'completed' || displayStatus === 'confirmed'}
+                        disabled={displayStatus === 'completed'}
                         className={`text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                          displayStatus === 'completed' || displayStatus === 'confirmed'
+                          displayStatus === 'completed'
                             ? 'bg-gray-100 cursor-not-allowed opacity-60'
                             : 'bg-white cursor-pointer'
                         }`}
@@ -617,7 +617,7 @@ export default function AdminPage({ onNavigate }: AdminPageProps = {}) {
                         <option value="completed">Complétée</option>
                         <option value="cancelled">Annulée</option>
                       </select>
-                      {(displayStatus === 'completed' || displayStatus === 'confirmed') && (
+                      {displayStatus === 'completed' && (
                         <p className="text-xs text-gray-500 mt-1">Statut verrouillé</p>
                       )}
                     </td>
