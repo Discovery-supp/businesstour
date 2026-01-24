@@ -26,7 +26,7 @@ export function ToursPage() {
         'Soutien professionnel pour la signature de contrats d\'exclusivité avec les fournisseurs, consolidant ainsi des partenariats stratégiques',
         'Achat billet d\'avion (optionnel après l\'obtention du visa)',
       ],
-      image: 'https://images.pexels.com/photos/1486222/pexels-photo-1486222.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/Image12.jpeg',
     },
     {
       destination: 'Turquie',
@@ -40,7 +40,7 @@ export function ToursPage() {
         'Soutien professionnel pour la signature de contrats d\'exclusivité avec les fournisseurs, consolidant ainsi des partenariats stratégiques',
         'Achat billet d\'avion (optionnel après l\'obtention du visa)',
       ],
-      image: 'https://images.pexels.com/photos/1486222/pexels-photo-1486222.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/Image11.jpeg',
     },
     {
       destination: 'Turquie',
@@ -53,7 +53,7 @@ export function ToursPage() {
         'Services de traduction multilingue assurant une communication fluide entre les participants et les acteurs (français-chinois-anglais, etc.)',
         'Soutien professionnel pour la signature de contrats d\'exclusivité avec les fournisseurs, consolidant ainsi des partenariats stratégiques',
       ],
-      image: 'https://images.pexels.com/photos/1486222/pexels-photo-1486222.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/Image11.jpeg',
     },
     {
       destination: 'Dubai',
@@ -71,7 +71,7 @@ export function ToursPage() {
         'Soutien professionnel pour la signature de contrats d\'exclusivité avec les fournisseurs, consolidant ainsi des partenariats stratégiques',
         'Achat billet d\'avion (optionnel après l\'obtention du visa)',
       ],
-      image: 'https://images.pexels.com/photos/1470502/pexels-photo-1470502.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/Image 7.jpeg',
     },
     {
       destination: 'Dubai',
@@ -85,7 +85,7 @@ export function ToursPage() {
         'Soutien professionnel pour la signature de contrats d\'exclusivité avec les fournisseurs, consolidant ainsi des partenariats stratégiques',
         'Achat billet d\'avion (optionnel après l\'obtention du visa)',
       ],
-      image: 'https://images.pexels.com/photos/1470502/pexels-photo-1470502.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/Image 8.jpeg',
     },
     {
       destination: 'Dubai',
@@ -98,7 +98,7 @@ export function ToursPage() {
         'Services de traduction multilingue assurant une communication fluide entre les participants et les acteurs (français-chinois-anglais, etc.)',
         'Soutien professionnel pour la signature de contrats d\'exclusivité avec les fournisseurs, consolidant ainsi des partenariats stratégiques',
       ],
-      image: 'https://images.pexels.com/photos/1470502/pexels-photo-1470502.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/Image 8.jpeg',
     },
     {
       destination: 'Chine',
@@ -116,7 +116,7 @@ export function ToursPage() {
         'Soutien professionnel pour la signature de contrats d\'exclusivité avec les fournisseurs, consolidant ainsi des partenariats stratégiques',
         'Achat billet d\'avion (optionnel après l\'obtention du visa)',
       ],
-      image: 'https://images.pexels.com/photos/2422259/pexels-photo-2422259.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/Image 10.jpeg',
     },
     {
       destination: 'Chine',
@@ -130,7 +130,7 @@ export function ToursPage() {
         'Soutien professionnel pour la signature de contrats d\'exclusivité avec les fournisseurs, consolidant ainsi des partenariats stratégiques',
         'Achat billet d\'avion (optionnel après l\'obtention du visa)',
       ],
-      image: 'https://images.pexels.com/photos/2422259/pexels-photo-2422259.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/Image9.jpeg',
     },
     {
       destination: 'Chine',
@@ -143,7 +143,7 @@ export function ToursPage() {
         'Services de traduction multilingue assurant une communication fluide entre les participants et les acteurs (français-chinois-anglais, etc.)',
         'Soutien professionnel pour la signature de contrats d\'exclusivité avec les fournisseurs, consolidant ainsi des partenariats stratégiques',
       ],
-      image: 'https://images.pexels.com/photos/2422259/pexels-photo-2422259.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/Image9.jpeg',
     },
     {
       destination: 'Bénin',
@@ -161,7 +161,7 @@ export function ToursPage() {
         'Soutien professionnel pour la signature de contrats d\'exclusivité avec les fournisseurs, consolidant ainsi des partenariats stratégiques',
         'Achat billet d\'avion (optionnel après l\'obtention du visa)',
       ],
-      image: 'https://images.pexels.com/photos/5214413/pexels-photo-5214413.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/Image 14.jpeg',
     },
     {
       destination: 'Bénin',
@@ -175,7 +175,7 @@ export function ToursPage() {
         'Soutien professionnel pour la signature de contrats d\'exclusivité avec les fournisseurs, consolidant ainsi des partenariats stratégiques',
         'Achat billet d\'avion (optionnel après l\'obtention du visa)',
       ],
-      image: 'https://images.pexels.com/photos/5214413/pexels-photo-5214413.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/Image13.jpeg',
     },
     {
       destination: 'Bénin',
@@ -188,7 +188,7 @@ export function ToursPage() {
         'Services de traduction multilingue assurant une communication fluide entre les participants et les acteurs (français-chinois-anglais, etc.)',
         'Soutien professionnel pour la signature de contrats d\'exclusivité avec les fournisseurs, consolidant ainsi des partenariats stratégiques',
       ],
-      image: 'https://images.pexels.com/photos/5214413/pexels-photo-5214413.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: '/images/Image13.jpeg',
     },
   ];
 
