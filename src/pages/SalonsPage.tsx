@@ -193,7 +193,7 @@ export function SalonsPage() {
                     </div>
                   </div>
 
-                  <p className="text-sm text-gray-300 mb-4 line-clamp-3">
+                  <p className="text-sm text-gray-300 mb-4">
                     {isFrench ? salon.description : salon.descriptionEn}
                   </p>
 
