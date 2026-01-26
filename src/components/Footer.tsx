@@ -52,7 +52,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li className="flex items-start space-x-2">
                 <Mail className="w-5 h-5 mt-0.5" />
-                <span className="text-sm">contact@businesstours.com</span>
+                <span className="text-sm">contact@businesstours.org</span>
               </li>
               <li className="flex items-start space-x-2">
                 <Phone className="w-5 h-5 mt-0.5" />

@@ -158,7 +158,7 @@ exports.handler = async (event) => {
                 <p>L'équipe Business Tours</p>
                 <p style="font-size: 12px; margin-top: 20px;">
                   Si vous avez des questions, n'hésitez pas à nous contacter à l'adresse suivante : 
-                  <a href="mailto:contact@businesstours.com" style="color: #ec4899;">contact@businesstours.com</a>
+                  <a href="mailto:contact@businesstours.org" style="color: #ec4899;">contact@businesstours.org</a>
                 </p>
               </div>
             </div>

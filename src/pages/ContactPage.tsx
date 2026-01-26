@@ -79,7 +79,7 @@ export function ContactPage() {
                 <Mail className="w-8 h-8 text-pink-500" />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">Email</h3>
-              <p className="text-gray-400">contact@businesstours.com</p>
+              <p className="text-gray-400">contact@businesstours.org</p>
               <p className="text-gray-400">info@businesstours.com</p>
             </div>
 
