@@ -59,7 +59,7 @@ npm run dev
 Stripe fournit des cartes de test :
 
 **Carte de test qui fonctionne :**
-- Numéro : `4242 4242 4242 4242`
+- Numéro : ` 4242 42424242 4242`
 - Date d'expiration : N'importe quelle date future (ex: `12/25`)
 - CVC : N'importe quel 3 chiffres (ex: `123`)
 - Code postal : N'importe quel code postal (ex: `12345`)
